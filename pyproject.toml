@@ -1,0 +1,33 @@
+d[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gsprec"
+version = "0.1.0"
+description = "Graph Structural Pre-conditioning recommender system"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "kagglehub",
+  "pandas",
+  "numpy",
+  "scipy",
+  "scikit-learn",
+  "networkx",
+  "tqdm",
+  "psutil",
+  "vaderSentiment",
+  "torch",
+  "torch-geometric"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+gsprec-run = "gsprec.pipeline.runner:main"
+gsprec-yelp = "gsprec.pipeline.yelp_runner:main"

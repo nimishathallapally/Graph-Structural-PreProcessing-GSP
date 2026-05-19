@@ -1,0 +1,54 @@
+{
+  "output_dir": "outputs/yelp",
+  "run_baseline": true,
+  "models": ["lightgcn", "gat", "graphsage", "gcn"],
+  "data": {
+    "dataset_name": "yelp",
+    "dataset_path": "./data",
+    "implicit_threshold": 3.5,
+    "test_seed": 42,
+    "debug_mode": false,
+    "max_debug_users": 5000,
+    "cache_dir": "outputs/yelp/cache",
+    "force_reload": false,
+    "min_interactions": 5
+  },
+  "gsp": {
+    "alpha": 0.5,
+    "curvature_percentile": 70.0,
+    "min_shared_interactions": 2,
+    "curvature_topk": 0,
+    "importance_percentile": 50.0,
+    "importance_topk": 0,
+    "er_num_eigenvectors": 32,
+    "max_cluster_size": 10
+  },
+  "train": {
+    "epochs": 50,
+    "lr": 0.005,
+    "weight_decay": 1e-5,
+    "batch_size": 65536,
+    "neg_ratio": 4,
+    "rating_loss_weight": 0.0,
+    "emb_l2_weight": 1e-5,
+    "emb_dim": 64,
+    "hidden_dim": 128,
+    "out_dim": 64,
+    "num_layers": 3,
+    "heads": 4,
+    "dropout": 0.1,
+    "use_amp": true,
+    "seed": 42
+  },
+  "eval": {
+    "k": 10,
+    "num_negatives": 99,
+    "seed": 42
+  },
+  "ablation": {
+    "enabled": false,
+    "ablation_model": "lightgcn",
+    "ablation_epochs": 10,
+    "importance_percentiles": [20.0, 50.0, 80.0]
+  }
+}

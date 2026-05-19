@@ -1,0 +1,124 @@
+\chapter{Introduction}
+\graphicspath{{Chapter1/}}
+
+\section{Motivation}
+
+Recommendation systems are widely used in domains such as education, healthcare,
+and e-commerce platforms. However, when these recommendation systems are scaled to millions of users
+and items, traditional Graph Neural Networks (GNNs) face a significant issues with
+scalability.
+\newline
+Current GNN-based recommenders suffer from two primary bottlenecks. First, the
+message-passing mechanism requires processing each and every node and edge, leading to high GPU usage. Secondly, users are unable to understand the reasoning behind why a particular recommendation is being generated.
+
+\section{Challenges}
+
+Despite their theoretical benefits, deploying GNN-based recommendation systems in real time comes with its own challenges:
+
+\textbf{Scaling:}  
+Real-world interaction dataset graphs often contain billions of nodes and edges, making full-graph training infeasible due to memory constraints, we often run into CUDA out of memory errors.
+
+\textbf{Data Skew (Hotspots):}  
+ Most of the real-world graphs follow a power-law distribution,
+where a small number of “super-nodes” have very high connectivity , they have a large number of edges. These hotspots cause workload imbalance and computational bottlenecks during distributed processing or parallel processing.
+
+\textbf{The Density Issue:}  
+Naive node reduction strategies can cause increase in node density. As a result, neighbor sampling becomes more computationally expensive, slowing down training rather than improving it.
+
+\textbf{Information Redundancy:}  
+Traditional GNNs repeatedly computes overlapping neighborhood information across the multiple layers during the training process, leading to redundant computation and inefficient inference.
+
+\textbf{The ``Black Box'' Problem:}  
+Graph simplification techniques that generate synthetic or proxy graph from scratch often loose interpretability in the process, making it difficult to explain the generated recommendations to end users.
+
+\textbf{Memory Inefficiency:}  
+Each node in a graph has different number of neighbors and these neighbor indices are scattered over the memory which causes Irregular memory access patterns and in the real time graphs most of the datasets are sparse and these sparse data structures in conventional GNN frameworks cause hardware level inefficiencies.
+
+\section{Problem Statement}
+
+Scaling GNNs is challenging because reducing the graph size can increase structural
+density because now each node has more number of edges, which in turn slows down the training process. Additionally, these models often lack transparency, acting as black boxes that fail to explain the reasoning behind the generated recommendations.
+
+Furthermore, naive data reduction methods may eliminate unique connections, resulting in repetitive recommendations and there would be a lack of diversity for users.
+
+\section{Research Objectives}
+\begin{itemize}
+    \item Developing an Intrinsic Graph Properties (IGP) framework.
+    \item Exploiting discrete graph properties (curvature and centrality) to reduce the graph structurally.
+    \item Implementing structural counterfactual explanations to understand why a recommendation is generated
+
+\end{itemize}
+
+% \section{Motivation}
+
+% Recommendation systems have become a core part of how modern platforms 
+% operate -whether it's suggesting the next course on an e-learning site, or nudging a 
+% shopper toward a product they didn't know they wanted.
+
+% As datasets grow to millions of users and items, Graph Neural Networks 
+% (GNNs), which are otherwise well-suited for modeling these relational 
+% structures begin to hit a hard wall.First, the message-passing paradigm requires processing every node and edge, leading to substantial VRAM overhead. Second, users are unable to understand the causal reasoning behind recommendations, limiting trust and transparency.
+
+
+
+% \section{Challenges}
+
+% \subsection*{Scaling}
+% The most straightforward problem is size. Real-world interaction graphs 
+% routinely contain billions of nodes and edges, and full-graph training 
+% simply isn't feasible on any hardware.
+
+% \subsection*{Data Skew (Hotspots)}
+% Real graphs don't distribute connections evenly, they follow a power-law, 
+% meaning a relatively small number of nodes accumulate a wildly 
+% disproportionate share of edges. In a recommendation context, think of 
+% a viral product or a universally popular movie. These nodes
+% create severe workload imbalance during distributed training; the servers 
+% responsible for them get hammered while everyone else sits idle.
+
+% \subsection*{The Density Issue}
+% Here's where things get counterintuitive. You'd assume that reducing the 
+% number of nodes would make training faster. In practice, collapsing nodes 
+% together concentrates their edges, which can actually make local 
+% neighborhoods denser. The neighbor sampler then has to work harder per 
+% node, not easier and the expected speedup evaporates.
+
+% \subsection*{Information Redundancy}
+% Across multiple GNN layers, the same neighborhood information gets 
+% recomputed repeatedly. There's no mechanism in a standard GNN to 
+% recognize that it's already seen a particular structural pattern and skip 
+% the redundant work. At scale, this adds up fast.
+
+% \subsection*{The ``Black Box'' Problem}
+% Many graph simplification methods work by generating synthetic proxy 
+% structures,artificial nodes and edges that approximate the original 
+% graph's behavior. The tradeoff is that these structures no longer 
+% correspond to anything real. When a recommendation comes out the other 
+% end, there's no meaningful way to trace it back to an actual user 
+% interaction. Explainability is lost by design.
+
+% \subsection*{Memory Inefficiency}
+% Even setting aside the scale problem, the way GNN computations are laid 
+% out in memory tends to be irregular. Sparse graph structures don't play 
+% nicely with the contiguous memory access patterns that GPUs are optimized 
+% for, leading to high data movement overhead and underutilized hardware.
+
+% \section{Problem Statement}
+
+%  Scaling GNNs is challenging because reducing the graph size can increase structural density, which paradoxically slows down training. Additionally, these models often lack transparency, acting as black boxes that fail to explain the reasoning behind recommendations. 
+
+% Furthermore, naive data reduction methods may eliminate unique connections, resulting in repetitive recommendations and reduced diversity for users.
+
+% \section{Research Objectives}
+
+% This project aims to bridge the gap between efficiency and trustworthiness by:
+
+% \begin{itemize}
+%     \item Developing an Intrinsic Graph Properties (IGP) framework.
+    
+%     \item Using curvature and centrality measures to identify and eliminate genuine redundancy without discarding structurally meaningful connections that drive recommendation diversity.
+    
+%     \item Building a counterfactual explanation layer that lets users 
+%     ask ``what would have to change for this recommendation to be 
+%     different?'' 
+% \end{itemize}

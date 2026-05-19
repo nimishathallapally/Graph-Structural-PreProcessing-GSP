@@ -1,0 +1,24 @@
+# Core data / ML
+kagglehub>=0.3
+pandas>=2.0
+numpy>=1.26
+scipy>=1.12
+scikit-learn>=1.4
+networkx>=3.2
+tqdm>=4.66
+psutil>=5.9
+vaderSentiment>=3.3
+
+# Visualisation (used by scripts/figures.py and scripts/plot_paper_figures.py)
+matplotlib>=3.8
+
+# Deep learning
+# NOTE: The default index pulls a CUDA-enabled wheel (several GB).
+# For CPU-only (much smaller), install torch separately first:
+#   pip install --index-url https://download.pytorch.org/whl/cpu torch
+torch>=2.2
+
+# Graph Neural Networks
+torch-geometric>=2.5
+
+# VS Code tip: set the interpreter to ./venv/bin/python so imports resolve.

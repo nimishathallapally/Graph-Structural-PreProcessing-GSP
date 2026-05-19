@@ -1,0 +1,496 @@
+﻿
+========== ML-1M ==========
+
+  [forman_ricci|frac025|ms1]  nodes:0.00%  edges:0.00%  prepro:0.6s
+    LightGCN      base: NDCG=0.0566 Rec=0.0934 Prec=0.0093 time=9.8s
+    LightGCN       gsp: NDCG=0.0551 Rec=0.0861 Prec=0.0086 time=9.0s
+    GCN           base: NDCG=0.2384 Rec=0.4570 Prec=0.0457 time=7.7s
+    GCN            gsp: NDCG=0.2392 Rec=0.4583 Prec=0.0458 time=7.8s
+    GraphSAGE     base: NDCG=0.2389 Rec=0.4596 Prec=0.0460 time=7.6s
+    GraphSAGE      gsp: NDCG=0.2402 Rec=0.4609 Prec=0.0461 time=7.7s
+    GAT           base: NDCG=0.3130 Rec=0.5430 Prec=0.0543 time=14.5s
+    GAT            gsp: NDCG=0.3131 Rec=0.5430 Prec=0.0543 time=14.7s
+
+  [forman_ricci|frac025|ms3]  nodes:0.00%  edges:0.00%  prepro:0.6s
+    LightGCN      base: NDCG=0.0543 Rec=0.0854 Prec=0.0085 time=9.7s
+    LightGCN       gsp: NDCG=0.0585 Rec=0.0954 Prec=0.0095 time=9.0s
+    GCN           base: NDCG=0.2418 Rec=0.4642 Prec=0.0464 time=7.6s
+    GCN            gsp: NDCG=0.2402 Rec=0.4616 Prec=0.0462 time=7.6s
+    GraphSAGE     base: NDCG=0.2404 Rec=0.4603 Prec=0.0460 time=7.6s
+    GraphSAGE      gsp: NDCG=0.2390 Rec=0.4603 Prec=0.0460 time=7.7s
+    GAT           base: NDCG=0.3123 Rec=0.5430 Prec=0.0543 time=14.5s
+    GAT            gsp: NDCG=0.3128 Rec=0.5437 Prec=0.0544 time=14.9s
+
+  [forman_ricci|frac025|ms5]  nodes:0.00%  edges:0.00%  prepro:0.6s
+    LightGCN      base: NDCG=0.0575 Rec=0.0848 Prec=0.0085 time=9.8s
+    LightGCN       gsp: NDCG=0.0599 Rec=0.0940 Prec=0.0094 time=9.1s
+    GCN           base: NDCG=0.2402 Rec=0.4623 Prec=0.0462 time=7.8s
+    GCN            gsp: NDCG=0.2445 Rec=0.4662 Prec=0.0466 time=7.8s
+    GraphSAGE     base: NDCG=0.2395 Rec=0.4596 Prec=0.0460 time=7.5s
+    GraphSAGE      gsp: NDCG=0.2395 Rec=0.4603 Prec=0.0460 time=7.8s
+    GAT           base: NDCG=0.3131 Rec=0.5430 Prec=0.0543 time=14.6s
+    GAT            gsp: NDCG=0.3130 Rec=0.5437 Prec=0.0544 time=14.9s
+
+  [forman_ricci|frac05|ms1]  nodes:0.00%  edges:0.00%  prepro:2.3s
+    LightGCN      base: NDCG=0.0539 Rec=0.0911 Prec=0.0091 time=15.3s
+    LightGCN       gsp: NDCG=0.0483 Rec=0.0798 Prec=0.0080 time=14.4s
+    GCN           base: NDCG=0.3933 Rec=0.6695 Prec=0.0670 time=13.8s
+    GCN            gsp: NDCG=0.3850 Rec=0.6371 Prec=0.0637 time=13.8s
+    GraphSAGE     base: NDCG=0.3843 Rec=0.6354 Prec=0.0635 time=13.5s
+    GraphSAGE      gsp: NDCG=0.3860 Rec=0.6364 Prec=0.0636 time=13.9s
+    GAT           base: NDCG=0.3331 Rec=0.5682 Prec=0.0568 time=18.1s
+    GAT            gsp: NDCG=0.3331 Rec=0.5685 Prec=0.0569 time=18.1s
+
+  [forman_ricci|frac05|ms3]  nodes:0.00%  edges:0.00%  prepro:2.3s
+    LightGCN      base: NDCG=0.0483 Rec=0.0821 Prec=0.0082 time=14.8s
+    LightGCN       gsp: NDCG=0.0520 Rec=0.0838 Prec=0.0084 time=14.3s
+    GCN           base: NDCG=0.3802 Rec=0.6348 Prec=0.0635 time=13.7s
+    GCN            gsp: NDCG=0.3878 Rec=0.6464 Prec=0.0646 time=13.6s
+    GraphSAGE     base: NDCG=0.3894 Rec=0.6334 Prec=0.0633 time=13.6s
+    GraphSAGE      gsp: NDCG=0.3754 Rec=0.6252 Prec=0.0625 time=13.7s
+    GAT           base: NDCG=0.3331 Rec=0.5682 Prec=0.0568 time=18.3s
+    GAT            gsp: NDCG=0.3330 Rec=0.5682 Prec=0.0568 time=18.5s
+
+  [forman_ricci|frac05|ms5]  nodes:0.03%  edges:0.01%  prepro:2.5s
+    LightGCN      base: NDCG=0.0511 Rec=0.0858 Prec=0.0086 time=14.9s
+    LightGCN       gsp: NDCG=0.0556 Rec=0.0987 Prec=0.0099 time=14.2s
+    GCN           base: NDCG=0.3955 Rec=0.6437 Prec=0.0644 time=13.6s
+    GCN            gsp: NDCG=0.3294 Rec=0.5808 Prec=0.0581 time=10.9s
+    GraphSAGE     base: NDCG=0.3860 Rec=0.6470 Prec=0.0647 time=13.5s
+    GraphSAGE      gsp: NDCG=0.3353 Rec=0.5854 Prec=0.0585 time=10.9s
+    GAT           base: NDCG=0.3332 Rec=0.5689 Prec=0.0569 time=18.0s
+    GAT            gsp: NDCG=0.1132 Rec=0.2477 Prec=0.0248 time=22.7s
+
+  [forman_ricci|frac075|ms1]  nodes:0.00%  edges:0.00%  prepro:5.0s
+    LightGCN      base: NDCG=0.0721 Rec=0.1224 Prec=0.0122 time=18.3s
+    LightGCN       gsp: NDCG=0.0764 Rec=0.1252 Prec=0.0125 time=17.6s
+    GCN           base: NDCG=0.3183 Rec=0.6055 Prec=0.0605 time=16.7s
+    GCN            gsp: NDCG=0.3192 Rec=0.6048 Prec=0.0605 time=17.0s
+    GraphSAGE     base: NDCG=0.3136 Rec=0.5977 Prec=0.0598 time=16.6s
+    GraphSAGE      gsp: NDCG=0.3546 Rec=0.6050 Prec=0.0605 time=16.8s
+    GAT           base: NDCG=0.1664 Rec=0.3320 Prec=0.0332 time=27.4s
+    GAT            gsp: NDCG=0.1666 Rec=0.3320 Prec=0.0332 time=27.4s
+
+  [forman_ricci|frac075|ms3]  nodes:0.00%  edges:0.00%  prepro:4.5s
+    LightGCN      base: NDCG=0.0775 Rec=0.1270 Prec=0.0127 time=18.3s
+    LightGCN       gsp: NDCG=0.0731 Rec=0.1206 Prec=0.0121 time=17.5s
+    GCN           base: NDCG=0.3545 Rec=0.6072 Prec=0.0607 time=16.7s
+    GCN            gsp: NDCG=0.3529 Rec=0.6055 Prec=0.0605 time=16.8s
+    GraphSAGE     base: NDCG=0.3073 Rec=0.5938 Prec=0.0594 time=16.7s
+    GraphSAGE      gsp: NDCG=0.3053 Rec=0.5876 Prec=0.0588 time=16.7s
+    GAT           base: NDCG=0.1666 Rec=0.3320 Prec=0.0332 time=27.8s
+    GAT            gsp: NDCG=0.1665 Rec=0.3320 Prec=0.0332 time=27.5s
+
+  [forman_ricci|frac075|ms5]  nodes:0.00%  edges:0.00%  prepro:4.0s
+    LightGCN      base: NDCG=0.0752 Rec=0.1299 Prec=0.0130 time=18.2s
+    LightGCN       gsp: NDCG=0.0756 Rec=0.1264 Prec=0.0126 time=17.3s
+    GCN           base: NDCG=0.3544 Rec=0.6061 Prec=0.0606 time=16.9s
+    GCN            gsp: NDCG=0.3513 Rec=0.6028 Prec=0.0603 time=16.9s
+    GraphSAGE     base: NDCG=0.3506 Rec=0.6035 Prec=0.0603 time=16.8s
+    GraphSAGE      gsp: NDCG=0.3573 Rec=0.6086 Prec=0.0609 time=16.9s
+    GAT           base: NDCG=0.1665 Rec=0.3318 Prec=0.0332 time=27.5s
+    GAT            gsp: NDCG=0.1665 Rec=0.3320 Prec=0.0332 time=27.4s
+
+  [forman_ricci|frac10|ms1]  nodes:0.00%  edges:0.00%  prepro:8.4s
+    LightGCN      base: NDCG=0.0766 Rec=0.0976 Prec=0.0098 time=20.0s
+    LightGCN       gsp: NDCG=0.0777 Rec=0.0992 Prec=0.0099 time=19.4s
+    GCN           base: NDCG=0.3456 Rec=0.6399 Prec=0.0640 time=18.6s
+    GCN            gsp: NDCG=0.3469 Rec=0.6430 Prec=0.0643 time=18.6s
+    GraphSAGE     base: NDCG=0.3448 Rec=0.6407 Prec=0.0641 time=18.6s
+    GraphSAGE      gsp: NDCG=0.3462 Rec=0.6465 Prec=0.0647 time=18.5s
+    GAT           base: NDCG=0.0888 Rec=0.1872 Prec=0.0187 time=32.5s
+    GAT            gsp: NDCG=0.0928 Rec=0.1958 Prec=0.0196 time=32.8s
+
+  [forman_ricci|frac10|ms3]  nodes:0.05%  edges:0.00%  prepro:7.7s
+    LightGCN      base: NDCG=0.0808 Rec=0.1052 Prec=0.0105 time=19.9s
+    LightGCN       gsp: NDCG=0.0635 Rec=0.1080 Prec=0.0108 time=17.8s
+    GCN           base: NDCG=0.3541 Rec=0.6477 Prec=0.0648 time=18.6s
+    GCN            gsp: NDCG=0.3014 Rec=0.5844 Prec=0.0584 time=18.7s
+    GraphSAGE     base: NDCG=0.3562 Rec=0.6512 Prec=0.0651 time=18.4s
+    GraphSAGE      gsp: NDCG=0.2983 Rec=0.5774 Prec=0.0577 time=18.7s
+    GAT           base: NDCG=0.0868 Rec=0.1849 Prec=0.0185 time=32.4s
+    GAT            gsp: NDCG=0.0673 Rec=0.1615 Prec=0.0162 time=31.4s
+
+  [forman_ricci|frac10|ms5]  nodes:0.15%  edges:0.01%  prepro:6.3s
+    LightGCN      base: NDCG=0.0779 Rec=0.1010 Prec=0.0101 time=20.0s
+    LightGCN       gsp: NDCG=0.0768 Rec=0.1479 Prec=0.0148 time=17.8s
+    GCN           base: NDCG=0.3441 Rec=0.6412 Prec=0.0641 time=18.4s
+    GCN            gsp: NDCG=0.3467 Rec=0.5922 Prec=0.0592 time=15.6s
+    GraphSAGE     base: NDCG=0.3541 Rec=0.6521 Prec=0.0652 time=18.4s
+    GraphSAGE      gsp: NDCG=0.3413 Rec=0.5854 Prec=0.0585 time=15.6s
+    GAT           base: NDCG=0.0896 Rec=0.1892 Prec=0.0189 time=32.4s
+    GAT            gsp: NDCG=0.1969 Rec=0.3931 Prec=0.0393 time=31.6s
+
+  [cosine|frac025|ms1]  nodes:0.00%  edges:0.00%  prepro:0.7s
+    LightGCN      base: NDCG=0.0491 Rec=0.0815 Prec=0.0081 time=9.8s
+    LightGCN       gsp: NDCG=0.0523 Rec=0.0848 Prec=0.0085 time=9.0s
+    GCN           base: NDCG=0.2392 Rec=0.4596 Prec=0.0460 time=7.7s
+    GCN            gsp: NDCG=0.2400 Rec=0.4603 Prec=0.0460 time=7.8s
+    GraphSAGE     base: NDCG=0.2387 Rec=0.4563 Prec=0.0456 time=7.7s
+    GraphSAGE      gsp: NDCG=0.2401 Rec=0.4603 Prec=0.0460 time=7.7s
+    GAT           base: NDCG=0.3131 Rec=0.5430 Prec=0.0543 time=14.5s
+    GAT            gsp: NDCG=0.3132 Rec=0.5444 Prec=0.0544 time=14.9s
+
+  [cosine|frac025|ms3]  nodes:0.00%  edges:0.00%  prepro:0.7s
+    LightGCN      base: NDCG=0.0578 Rec=0.0947 Prec=0.0095 time=9.9s
+    LightGCN       gsp: NDCG=0.0528 Rec=0.0861 Prec=0.0086 time=9.0s
+    GCN           base: NDCG=0.2389 Rec=0.4576 Prec=0.0458 time=7.8s
+    GCN            gsp: NDCG=0.2401 Rec=0.4603 Prec=0.0460 time=7.6s
+    GraphSAGE     base: NDCG=0.2394 Rec=0.4589 Prec=0.0459 time=7.5s
+    GraphSAGE      gsp: NDCG=0.2393 Rec=0.4609 Prec=0.0461 time=7.6s
+    GAT           base: NDCG=0.3124 Rec=0.5430 Prec=0.0543 time=14.6s
+    GAT            gsp: NDCG=0.3129 Rec=0.5430 Prec=0.0543 time=14.7s
+
+  [cosine|frac025|ms5]  nodes:0.00%  edges:0.00%  prepro:0.7s
+    LightGCN      base: NDCG=0.0546 Rec=0.0914 Prec=0.0091 time=9.7s
+    LightGCN       gsp: NDCG=0.0592 Rec=0.0894 Prec=0.0089 time=9.0s
+    GCN           base: NDCG=0.2396 Rec=0.4609 Prec=0.0461 time=7.7s
+    GCN            gsp: NDCG=0.2411 Rec=0.4623 Prec=0.0462 time=7.6s
+    GraphSAGE     base: NDCG=0.2395 Rec=0.4603 Prec=0.0460 time=7.5s
+    GraphSAGE      gsp: NDCG=0.2396 Rec=0.4603 Prec=0.0460 time=7.6s
+    GAT           base: NDCG=0.3131 Rec=0.5430 Prec=0.0543 time=14.4s
+    GAT            gsp: NDCG=0.3130 Rec=0.5437 Prec=0.0544 time=14.6s
+
+  [cosine|frac05|ms1]  nodes:0.03%  edges:0.01%  prepro:2.9s
+    LightGCN      base: NDCG=0.0486 Rec=0.0828 Prec=0.0083 time=14.8s
+    LightGCN       gsp: NDCG=0.0627 Rec=0.0937 Prec=0.0094 time=14.3s
+    GCN           base: NDCG=0.3823 Rec=0.6321 Prec=0.0632 time=13.8s
+    GCN            gsp: NDCG=0.3321 Rec=0.5848 Prec=0.0585 time=12.5s
+    GraphSAGE     base: NDCG=0.3809 Rec=0.6321 Prec=0.0632 time=13.7s
+    GraphSAGE      gsp: NDCG=0.3286 Rec=0.5805 Prec=0.0580 time=12.5s
+    GAT           base: NDCG=0.3331 Rec=0.5685 Prec=0.0569 time=18.1s
+    GAT            gsp: NDCG=0.1820 Rec=0.3649 Prec=0.0365 time=23.1s
+
+  [cosine|frac05|ms3]  nodes:0.03%  edges:0.01%  prepro:2.8s
+    LightGCN      base: NDCG=0.0486 Rec=0.0788 Prec=0.0079 time=14.8s
+    LightGCN       gsp: NDCG=0.0656 Rec=0.0980 Prec=0.0098 time=14.3s
+    GCN           base: NDCG=0.3810 Rec=0.6338 Prec=0.0634 time=13.7s
+    GCN            gsp: NDCG=0.3322 Rec=0.5805 Prec=0.0580 time=12.6s
+    GraphSAGE     base: NDCG=0.3803 Rec=0.6331 Prec=0.0633 time=13.6s
+    GraphSAGE      gsp: NDCG=0.3291 Rec=0.5805 Prec=0.0580 time=12.3s
+    GAT           base: NDCG=0.3331 Rec=0.5685 Prec=0.0569 time=18.2s
+    GAT            gsp: NDCG=0.1773 Rec=0.3563 Prec=0.0356 time=23.6s
+
+  [cosine|frac05|ms5]  nodes:0.03%  edges:0.01%  prepro:2.7s
+    LightGCN      base: NDCG=0.0529 Rec=0.0864 Prec=0.0086 time=14.8s
+    LightGCN       gsp: NDCG=0.0641 Rec=0.0940 Prec=0.0094 time=14.4s
+    GCN           base: NDCG=0.3885 Rec=0.6404 Prec=0.0640 time=13.7s
+    GCN            gsp: NDCG=0.3290 Rec=0.5801 Prec=0.0580 time=10.1s
+    GraphSAGE     base: NDCG=0.3905 Rec=0.6348 Prec=0.0635 time=13.9s
+    GraphSAGE      gsp: NDCG=0.3298 Rec=0.5811 Prec=0.0581 time=12.4s
+    GAT           base: NDCG=0.3331 Rec=0.5685 Prec=0.0569 time=18.3s
+    GAT            gsp: NDCG=0.1799 Rec=0.3623 Prec=0.0362 time=23.7s
+
+  [cosine|frac075|ms1]  nodes:0.00%  edges:0.00%  prepro:5.4s
+    LightGCN      base: NDCG=0.0709 Rec=0.1188 Prec=0.0119 time=18.3s
+    LightGCN       gsp: NDCG=0.0768 Rec=0.1301 Prec=0.0130 time=17.5s
+    GCN           base: NDCG=0.3174 Rec=0.6055 Prec=0.0605 time=16.8s
+    GCN            gsp: NDCG=0.3245 Rec=0.6086 Prec=0.0609 time=16.8s
+    GraphSAGE     base: NDCG=0.2990 Rec=0.5818 Prec=0.0582 time=16.7s
+    GraphSAGE      gsp: NDCG=0.3002 Rec=0.5776 Prec=0.0578 time=16.8s
+    GAT           base: NDCG=0.1665 Rec=0.3320 Prec=0.0332 time=27.4s
+    GAT            gsp: NDCG=0.1664 Rec=0.3318 Prec=0.0332 time=27.4s
+
+  [cosine|frac075|ms3]  nodes:0.00%  edges:0.00%  prepro:4.9s
+    LightGCN      base: NDCG=0.0774 Rec=0.1312 Prec=0.0131 time=18.5s
+    LightGCN       gsp: NDCG=0.0749 Rec=0.1257 Prec=0.0126 time=17.5s
+    GCN           base: NDCG=0.3555 Rec=0.6072 Prec=0.0607 time=16.9s
+    GCN            gsp: NDCG=0.3553 Rec=0.6075 Prec=0.0607 time=16.8s
+    GraphSAGE     base: NDCG=0.3184 Rec=0.6013 Prec=0.0601 time=16.8s
+    GraphSAGE      gsp: NDCG=0.2915 Rec=0.5697 Prec=0.0570 time=16.8s
+    GAT           base: NDCG=0.1666 Rec=0.3320 Prec=0.0332 time=27.4s
+    GAT            gsp: NDCG=0.1665 Rec=0.3320 Prec=0.0332 time=27.8s
+
+  [cosine|frac075|ms5]  nodes:0.04%  edges:0.00%  prepro:5.1s
+    LightGCN      base: NDCG=0.0797 Rec=0.1332 Prec=0.0133 time=18.4s
+    LightGCN       gsp: NDCG=0.0659 Rec=0.1089 Prec=0.0109 time=16.4s
+    GCN           base: NDCG=0.3562 Rec=0.6079 Prec=0.0608 time=17.1s
+    GCN            gsp: NDCG=0.3631 Rec=0.6143 Prec=0.0614 time=13.5s
+    GraphSAGE     base: NDCG=0.3552 Rec=0.6075 Prec=0.0607 time=16.8s
+    GraphSAGE      gsp: NDCG=0.3607 Rec=0.6132 Prec=0.0613 time=13.6s
+    GAT           base: NDCG=0.1665 Rec=0.3320 Prec=0.0332 time=27.3s
+    GAT            gsp: NDCG=0.1485 Rec=0.3223 Prec=0.0322 time=29.9s
+
+  [cosine|frac10|ms1]  nodes:0.00%  edges:0.00%  prepro:8.8s
+    LightGCN      base: NDCG=0.0804 Rec=0.1057 Prec=0.0106 time=20.0s
+    LightGCN       gsp: NDCG=0.0829 Rec=0.1068 Prec=0.0107 time=19.3s
+    GCN           base: NDCG=0.3468 Rec=0.6449 Prec=0.0645 time=18.4s
+    GCN            gsp: NDCG=0.3533 Rec=0.6478 Prec=0.0648 time=18.6s
+    GraphSAGE     base: NDCG=0.3548 Rec=0.6500 Prec=0.0650 time=18.3s
+    GraphSAGE      gsp: NDCG=0.3506 Rec=0.6465 Prec=0.0647 time=18.7s
+    GAT           base: NDCG=0.0888 Rec=0.1873 Prec=0.0187 time=32.1s
+    GAT            gsp: NDCG=0.0911 Rec=0.1925 Prec=0.0192 time=32.4s
+
+  [cosine|frac10|ms3]  nodes:0.02%  edges:0.00%  prepro:8.3s
+    LightGCN      base: NDCG=0.0779 Rec=0.1000 Prec=0.0100 time=19.9s
+    LightGCN       gsp: NDCG=0.0813 Rec=0.1367 Prec=0.0137 time=19.4s
+    GCN           base: NDCG=0.3528 Rec=0.6495 Prec=0.0649 time=18.7s
+    GCN            gsp: NDCG=0.3141 Rec=0.5536 Prec=0.0554 time=15.0s
+    GraphSAGE     base: NDCG=0.3521 Rec=0.6492 Prec=0.0649 time=18.5s
+    GraphSAGE      gsp: NDCG=0.3186 Rec=0.5533 Prec=0.0553 time=14.8s
+    GAT           base: NDCG=0.0884 Rec=0.1868 Prec=0.0187 time=32.0s
+    GAT            gsp: NDCG=0.1348 Rec=0.2756 Prec=0.0276 time=29.1s
+
+  [cosine|frac10|ms5]  nodes:0.03%  edges:0.00%  prepro:6.8s
+    LightGCN      base: NDCG=0.0802 Rec=0.1042 Prec=0.0104 time=19.9s
+    LightGCN       gsp: NDCG=0.0723 Rec=0.1360 Prec=0.0136 time=18.5s
+    GCN           base: NDCG=0.3337 Rec=0.6301 Prec=0.0630 time=18.8s
+    GCN            gsp: NDCG=0.3550 Rec=0.6026 Prec=0.0603 time=17.8s
+    GraphSAGE     base: NDCG=0.3446 Rec=0.6410 Prec=0.0641 time=18.6s
+    GraphSAGE      gsp: NDCG=0.3589 Rec=0.6061 Prec=0.0606 time=17.9s
+    GAT           base: NDCG=0.0931 Rec=0.1963 Prec=0.0196 time=32.1s
+    GAT            gsp: NDCG=0.1766 Rec=0.3540 Prec=0.0354 time=26.3s
+
+========== ML-25M ==========
+
+  [forman_ricci|frac10|ms1]  nodes:0.02%  edges:0.00%  prepro:208.5s
+    LightGCN      base: NDCG=0.1081 Rec=0.1465 Prec=0.0146 time=3407.6s
+    LightGCN       gsp: NDCG=0.1031 Rec=0.1479 Prec=0.0148 time=3414.2s
+    GCN           base: NDCG=0.5268 Rec=0.8557 Prec=0.0856 time=15144.6s
+    GCN            gsp: NDCG=0.4443 Rec=0.7773 Prec=0.0777 time=24025.0s
+    GraphSAGE     base: NDCG=0.3923 Rec=0.7249 Prec=0.0725 time=20625.3s
+    GraphSAGE      gsp: NDCG=0.4267 Rec=0.7448 Prec=0.0745 time=12447.9s
+    GAT           base: NDCG=nan Rec=nan Prec=nan time=nans
+    GAT            gsp: NDCG=nan Rec=nan Prec=nan time=nans
+
+========== Yelp ==========
+
+  [forman_ricci|frac025|ms1]  nodes:0.04%  edges:0.00%  prepro:12.5s
+    LightGCN      base: NDCG=0.3010 Rec=0.6074 Prec=0.0607 time=16.7s
+    LightGCN       gsp: NDCG=0.3116 Rec=0.6296 Prec=0.0630 time=17.1s
+    GCN           base: NDCG=0.5668 Rec=0.9050 Prec=0.0905 time=38.8s
+    GCN            gsp: NDCG=0.5562 Rec=0.9003 Prec=0.0900 time=38.7s
+    GraphSAGE     base: NDCG=0.5711 Rec=0.9065 Prec=0.0906 time=38.5s
+    GraphSAGE      gsp: NDCG=0.5600 Rec=0.9021 Prec=0.0902 time=38.9s
+    GAT           base: NDCG=0.5066 Rec=0.8875 Prec=0.0888 time=73.9s
+    GAT            gsp: NDCG=0.5221 Rec=0.8911 Prec=0.0891 time=73.2s
+
+  [forman_ricci|frac025|ms3]  nodes:1.72%  edges:0.12%  prepro:4.3s
+    LightGCN      base: NDCG=0.3010 Rec=0.6074 Prec=0.0607 time=16.9s
+    LightGCN       gsp: NDCG=0.3016 Rec=0.6195 Prec=0.0619 time=21.9s
+    GCN           base: NDCG=0.5709 Rec=0.9053 Prec=0.0905 time=38.7s
+    GCN            gsp: NDCG=0.5500 Rec=0.9016 Prec=0.0902 time=38.9s
+    GraphSAGE     base: NDCG=0.5898 Rec=0.9157 Prec=0.0916 time=38.7s
+    GraphSAGE      gsp: NDCG=0.5341 Rec=0.8944 Prec=0.0894 time=38.9s
+    GAT           base: NDCG=0.5085 Rec=0.8883 Prec=0.0888 time=73.8s
+    GAT            gsp: NDCG=0.4235 Rec=0.8271 Prec=0.0827 time=73.2s
+
+  [forman_ricci|frac025|ms5]  nodes:4.29%  edges:0.51%  prepro:2.5s
+    LightGCN      base: NDCG=0.3010 Rec=0.6074 Prec=0.0607 time=16.8s
+    LightGCN       gsp: NDCG=0.3016 Rec=0.6257 Prec=0.0626 time=25.7s
+    GCN           base: NDCG=0.5694 Rec=0.9068 Prec=0.0907 time=39.0s
+    GCN            gsp: NDCG=0.5550 Rec=0.9048 Prec=0.0905 time=38.6s
+    GraphSAGE     base: NDCG=0.5678 Rec=0.9076 Prec=0.0908 time=38.7s
+    GraphSAGE      gsp: NDCG=0.5434 Rec=0.9016 Prec=0.0902 time=38.4s
+    GAT           base: NDCG=0.5082 Rec=0.8884 Prec=0.0888 time=73.6s
+    GAT            gsp: NDCG=0.3841 Rec=0.7804 Prec=0.0780 time=73.5s
+
+  [forman_ricci|frac05|ms1]  nodes:0.06%  edges:0.00%  prepro:27.7s
+    LightGCN      base: NDCG=0.1011 Rec=0.2176 Prec=0.0218 time=20.6s
+    LightGCN       gsp: NDCG=0.0897 Rec=0.1976 Prec=0.0198 time=19.6s
+    GCN           base: NDCG=0.5628 Rec=0.9026 Prec=0.0903 time=62.1s
+    GCN            gsp: NDCG=0.5589 Rec=0.9009 Prec=0.0901 time=61.9s
+    GraphSAGE     base: NDCG=0.5702 Rec=0.9067 Prec=0.0907 time=62.3s
+    GraphSAGE      gsp: NDCG=0.5514 Rec=0.8975 Prec=0.0897 time=61.8s
+    GAT           base: NDCG=0.5578 Rec=0.8987 Prec=0.0899 time=154.2s
+    GAT            gsp: NDCG=0.4889 Rec=0.8552 Prec=0.0855 time=154.6s
+
+  [forman_ricci|frac05|ms3]  nodes:3.54%  edges:0.33%  prepro:6.8s
+    LightGCN      base: NDCG=0.1011 Rec=0.2176 Prec=0.0218 time=20.3s
+    LightGCN       gsp: NDCG=0.0829 Rec=0.1862 Prec=0.0186 time=19.7s
+    GCN           base: NDCG=0.5597 Rec=0.9000 Prec=0.0900 time=61.6s
+    GCN            gsp: NDCG=0.5600 Rec=0.9018 Prec=0.0902 time=61.2s
+    GraphSAGE     base: NDCG=0.5593 Rec=0.9006 Prec=0.0901 time=62.0s
+    GraphSAGE      gsp: NDCG=0.5586 Rec=0.9018 Prec=0.0902 time=61.5s
+    GAT           base: NDCG=0.5690 Rec=0.9013 Prec=0.0901 time=154.2s
+    GAT            gsp: NDCG=0.4883 Rec=0.8718 Prec=0.0872 time=153.7s
+
+  [forman_ricci|frac05|ms5]  nodes:4.74%  edges:0.77%  prepro:3.8s
+    LightGCN      base: NDCG=0.1011 Rec=0.2176 Prec=0.0218 time=20.4s
+    LightGCN       gsp: NDCG=0.0944 Rec=0.1999 Prec=0.0200 time=20.1s
+    GCN           base: NDCG=0.5638 Rec=0.9032 Prec=0.0903 time=62.2s
+    GCN            gsp: NDCG=0.5347 Rec=0.8913 Prec=0.0891 time=59.3s
+    GraphSAGE     base: NDCG=0.5615 Rec=0.9019 Prec=0.0902 time=62.2s
+    GraphSAGE      gsp: NDCG=0.5313 Rec=0.8901 Prec=0.0890 time=59.0s
+    GAT           base: NDCG=0.5616 Rec=0.8998 Prec=0.0900 time=154.0s
+    GAT            gsp: NDCG=0.5168 Rec=0.8799 Prec=0.0880 time=148.2s
+
+  [forman_ricci|frac075|ms1]  nodes:0.10%  edges:0.00%  prepro:68.4s
+    LightGCN      base: NDCG=0.1094 Rec=0.2015 Prec=0.0201 time=19.4s
+    LightGCN       gsp: NDCG=0.1073 Rec=0.1975 Prec=0.0197 time=18.6s
+    GCN           base: NDCG=0.5723 Rec=0.9038 Prec=0.0904 time=78.9s
+    GCN            gsp: NDCG=0.5717 Rec=0.9015 Prec=0.0902 time=79.5s
+    GraphSAGE     base: NDCG=0.5733 Rec=0.9049 Prec=0.0905 time=79.2s
+    GraphSAGE      gsp: NDCG=0.5711 Rec=0.9005 Prec=0.0900 time=78.6s
+    GAT           base: NDCG=0.5573 Rec=0.8994 Prec=0.0899 time=199.4s
+    GAT            gsp: NDCG=0.5037 Rec=0.8658 Prec=0.0866 time=200.1s
+
+  [forman_ricci|frac075|ms3]  nodes:4.11%  edges:0.47%  prepro:62.7s
+    LightGCN      base: NDCG=0.1094 Rec=0.2015 Prec=0.0201 time=19.3s
+    LightGCN       gsp: NDCG=0.1349 Rec=0.2363 Prec=0.0236 time=18.3s
+    GCN           base: NDCG=0.5556 Rec=0.8968 Prec=0.0897 time=79.0s
+    GCN            gsp: NDCG=0.5512 Rec=0.8944 Prec=0.0894 time=78.4s
+    GraphSAGE     base: NDCG=0.5696 Rec=0.9043 Prec=0.0904 time=78.6s
+    GraphSAGE      gsp: NDCG=0.5495 Rec=0.8949 Prec=0.0895 time=78.2s
+    GAT           base: NDCG=0.5548 Rec=0.8991 Prec=0.0899 time=199.5s
+    GAT            gsp: NDCG=0.5291 Rec=0.8839 Prec=0.0884 time=199.1s
+
+  [forman_ricci|frac075|ms5]  nodes:3.67%  edges:0.77%  prepro:70.0s
+    LightGCN      base: NDCG=0.1094 Rec=0.2015 Prec=0.0201 time=19.0s
+    LightGCN       gsp: NDCG=0.1006 Rec=0.1893 Prec=0.0189 time=18.3s
+    GCN           base: NDCG=0.5627 Rec=0.9009 Prec=0.0901 time=78.6s
+    GCN            gsp: NDCG=0.5540 Rec=0.8984 Prec=0.0898 time=77.8s
+    GraphSAGE     base: NDCG=0.5567 Rec=0.8999 Prec=0.0900 time=78.7s
+    GraphSAGE      gsp: NDCG=0.5577 Rec=0.9010 Prec=0.0901 time=78.7s
+    GAT           base: NDCG=0.5563 Rec=0.8993 Prec=0.0899 time=199.5s
+    GAT            gsp: NDCG=0.5036 Rec=0.8776 Prec=0.0878 time=198.6s
+
+  [forman_ricci|frac10|ms1]  nodes:0.17%  edges:0.01%  prepro:105.6s
+    LightGCN      base: NDCG=0.0945 Rec=0.1769 Prec=0.0177 time=22.9s
+    LightGCN       gsp: NDCG=0.0966 Rec=0.1800 Prec=0.0180 time=22.6s
+    GCN           base: NDCG=0.5825 Rec=0.9075 Prec=0.0907 time=95.7s
+    GCN            gsp: NDCG=0.5624 Rec=0.9005 Prec=0.0901 time=95.5s
+    GraphSAGE     base: NDCG=0.5836 Rec=0.9086 Prec=0.0909 time=95.5s
+    GraphSAGE      gsp: NDCG=0.5658 Rec=0.9007 Prec=0.0901 time=95.9s
+    GAT           base: NDCG=0.5183 Rec=0.8762 Prec=0.0876 time=244.0s
+    GAT            gsp: NDCG=0.5300 Rec=0.8820 Prec=0.0882 time=244.7s
+
+  [forman_ricci|frac10|ms3]  nodes:4.35%  edges:0.59%  prepro:105.5s
+    LightGCN      base: NDCG=0.0945 Rec=0.1769 Prec=0.0177 time=22.9s
+    LightGCN       gsp: NDCG=0.0992 Rec=0.1842 Prec=0.0184 time=28.5s
+    GCN           base: NDCG=0.5947 Rec=0.9115 Prec=0.0911 time=95.6s
+    GCN            gsp: NDCG=0.5854 Rec=0.9076 Prec=0.0908 time=95.7s
+    GraphSAGE     base: NDCG=0.5761 Rec=0.9058 Prec=0.0906 time=95.0s
+    GraphSAGE      gsp: NDCG=0.5709 Rec=0.9012 Prec=0.0901 time=95.3s
+    GAT           base: NDCG=0.5477 Rec=0.8946 Prec=0.0895 time=244.2s
+    GAT            gsp: NDCG=0.4665 Rec=0.8457 Prec=0.0846 time=242.8s
+
+  [forman_ricci|frac10|ms5]  nodes:2.91%  edges:0.73%  prepro:102.2s
+    LightGCN      base: NDCG=0.0945 Rec=0.1769 Prec=0.0177 time=23.0s
+    LightGCN       gsp: NDCG=0.1135 Rec=0.2083 Prec=0.0208 time=24.3s
+    GCN           base: NDCG=0.5812 Rec=0.9081 Prec=0.0908 time=95.6s
+    GCN            gsp: NDCG=0.5611 Rec=0.9003 Prec=0.0900 time=94.7s
+    GraphSAGE     base: NDCG=0.5884 Rec=0.9104 Prec=0.0910 time=95.0s
+    GraphSAGE      gsp: NDCG=0.5649 Rec=0.8999 Prec=0.0900 time=95.0s
+    GAT           base: NDCG=0.4842 Rec=0.8602 Prec=0.0860 time=243.9s
+    GAT            gsp: NDCG=0.5319 Rec=0.8835 Prec=0.0883 time=242.9s
+
+  [cosine|frac025|ms1]  nodes:0.10%  edges:0.01%  prepro:17.8s
+    LightGCN      base: NDCG=0.3010 Rec=0.6074 Prec=0.0607 time=16.9s
+    LightGCN       gsp: NDCG=0.3057 Rec=0.5959 Prec=0.0596 time=14.6s
+    GCN           base: NDCG=0.5656 Rec=0.9048 Prec=0.0905 time=38.6s
+    GCN            gsp: NDCG=0.5754 Rec=0.9127 Prec=0.0913 time=38.6s
+    GraphSAGE     base: NDCG=0.5675 Rec=0.9066 Prec=0.0907 time=38.5s
+    GraphSAGE      gsp: NDCG=0.5629 Rec=0.9090 Prec=0.0909 time=38.6s
+    GAT           base: NDCG=0.5071 Rec=0.8881 Prec=0.0888 time=73.6s
+    GAT            gsp: NDCG=0.4062 Rec=0.8019 Prec=0.0802 time=73.5s
+
+  [cosine|frac025|ms3]  nodes:1.15%  edges:0.14%  prepro:5.4s
+    LightGCN      base: NDCG=0.3010 Rec=0.6074 Prec=0.0607 time=16.9s
+    LightGCN       gsp: NDCG=0.3036 Rec=0.6200 Prec=0.0620 time=20.3s
+    GCN           base: NDCG=0.5657 Rec=0.9060 Prec=0.0906 time=38.5s
+    GCN            gsp: NDCG=0.5665 Rec=0.9027 Prec=0.0903 time=38.7s
+    GraphSAGE     base: NDCG=0.5743 Rec=0.9088 Prec=0.0909 time=38.5s
+    GraphSAGE      gsp: NDCG=0.5637 Rec=0.9015 Prec=0.0901 time=38.6s
+    GAT           base: NDCG=0.5050 Rec=0.8860 Prec=0.0886 time=73.4s
+    GAT            gsp: NDCG=0.5224 Rec=0.8922 Prec=0.0892 time=73.4s
+
+  [cosine|frac025|ms5]  nodes:2.43%  edges:0.39%  prepro:2.7s
+    LightGCN      base: NDCG=0.3010 Rec=0.6074 Prec=0.0607 time=16.9s
+    LightGCN       gsp: NDCG=0.3094 Rec=0.6051 Prec=0.0605 time=18.5s
+    GCN           base: NDCG=0.5644 Rec=0.9056 Prec=0.0906 time=38.5s
+    GCN            gsp: NDCG=0.5536 Rec=0.8969 Prec=0.0897 time=38.3s
+    GraphSAGE     base: NDCG=0.5663 Rec=0.9070 Prec=0.0907 time=38.5s
+    GraphSAGE      gsp: NDCG=0.5549 Rec=0.8997 Prec=0.0900 time=38.4s
+    GAT           base: NDCG=0.5080 Rec=0.8883 Prec=0.0888 time=73.3s
+    GAT            gsp: NDCG=0.4444 Rec=0.8481 Prec=0.0848 time=73.3s
+
+  [cosine|frac05|ms1]  nodes:0.13%  edges:0.02%  prepro:39.2s
+    LightGCN      base: NDCG=0.1011 Rec=0.2176 Prec=0.0218 time=20.4s
+    LightGCN       gsp: NDCG=0.0873 Rec=0.1975 Prec=0.0197 time=19.6s
+    GCN           base: NDCG=0.5674 Rec=0.9053 Prec=0.0905 time=62.0s
+    GCN            gsp: NDCG=0.5745 Rec=0.9084 Prec=0.0908 time=61.4s
+    GraphSAGE     base: NDCG=0.5648 Rec=0.9036 Prec=0.0904 time=62.3s
+    GraphSAGE      gsp: NDCG=0.5761 Rec=0.9084 Prec=0.0908 time=62.0s
+    GAT           base: NDCG=0.5644 Rec=0.8999 Prec=0.0900 time=154.1s
+    GAT            gsp: NDCG=0.4781 Rec=0.8471 Prec=0.0847 time=154.6s
+
+  [cosine|frac05|ms3]  nodes:2.30%  edges:0.27%  prepro:7.1s
+    LightGCN      base: NDCG=0.1011 Rec=0.2176 Prec=0.0218 time=20.6s
+    LightGCN       gsp: NDCG=0.0949 Rec=0.2083 Prec=0.0208 time=19.7s
+    GCN           base: NDCG=0.5613 Rec=0.9026 Prec=0.0903 time=62.6s
+    GCN            gsp: NDCG=0.5624 Rec=0.9030 Prec=0.0903 time=61.6s
+    GraphSAGE     base: NDCG=0.5665 Rec=0.9042 Prec=0.0904 time=62.1s
+    GraphSAGE      gsp: NDCG=0.5558 Rec=0.9008 Prec=0.0901 time=62.0s
+    GAT           base: NDCG=0.5585 Rec=0.8976 Prec=0.0898 time=154.6s
+    GAT            gsp: NDCG=0.5505 Rec=0.8979 Prec=0.0898 time=154.6s
+
+  [cosine|frac05|ms5]  nodes:2.69%  edges:0.53%  prepro:3.9s
+    LightGCN      base: NDCG=0.1011 Rec=0.2176 Prec=0.0218 time=20.8s
+    LightGCN       gsp: NDCG=0.0848 Rec=0.1912 Prec=0.0191 time=19.7s
+    GCN           base: NDCG=0.5649 Rec=0.9036 Prec=0.0904 time=62.1s
+    GCN            gsp: NDCG=0.5509 Rec=0.8978 Prec=0.0898 time=62.2s
+    GraphSAGE     base: NDCG=0.5667 Rec=0.9047 Prec=0.0905 time=62.2s
+    GraphSAGE      gsp: NDCG=0.5548 Rec=0.8987 Prec=0.0899 time=62.0s
+    GAT           base: NDCG=0.5662 Rec=0.9009 Prec=0.0901 time=154.2s
+    GAT            gsp: NDCG=0.3916 Rec=0.7738 Prec=0.0774 time=153.9s
+
+  [cosine|frac075|ms1]  nodes:0.29%  edges:0.05%  prepro:71.6s
+    LightGCN      base: NDCG=0.1094 Rec=0.2015 Prec=0.0201 time=19.2s
+    LightGCN       gsp: NDCG=0.1077 Rec=0.1989 Prec=0.0199 time=18.6s
+    GCN           base: NDCG=0.5647 Rec=0.9025 Prec=0.0903 time=79.3s
+    GCN            gsp: NDCG=0.5821 Rec=0.9083 Prec=0.0908 time=79.4s
+    GraphSAGE     base: NDCG=0.5592 Rec=0.8999 Prec=0.0900 time=79.4s
+    GraphSAGE      gsp: NDCG=0.5813 Rec=0.9062 Prec=0.0906 time=79.8s
+    GAT           base: NDCG=0.5531 Rec=0.8983 Prec=0.0898 time=200.1s
+    GAT            gsp: NDCG=0.5157 Rec=0.8787 Prec=0.0879 time=200.0s
+
+  [cosine|frac075|ms3]  nodes:3.42%  edges:0.46%  prepro:69.6s
+    LightGCN      base: NDCG=0.1094 Rec=0.2015 Prec=0.0201 time=19.3s
+    LightGCN       gsp: NDCG=0.1533 Rec=0.2620 Prec=0.0262 time=18.4s
+    GCN           base: NDCG=0.5613 Rec=0.9002 Prec=0.0900 time=79.1s
+    GCN            gsp: NDCG=0.5736 Rec=0.9041 Prec=0.0904 time=78.6s
+    GraphSAGE     base: NDCG=0.5575 Rec=0.9003 Prec=0.0900 time=79.2s
+    GraphSAGE      gsp: NDCG=0.5662 Rec=0.9008 Prec=0.0901 time=78.7s
+    GAT           base: NDCG=0.5535 Rec=0.8983 Prec=0.0898 time=200.1s
+    GAT            gsp: NDCG=0.5287 Rec=0.8845 Prec=0.0885 time=199.5s
+
+  [cosine|frac075|ms5]  nodes:2.50%  edges:0.64%  prepro:79.5s
+    LightGCN      base: NDCG=0.1094 Rec=0.2015 Prec=0.0201 time=19.1s
+    LightGCN       gsp: NDCG=0.1497 Rec=0.2556 Prec=0.0256 time=18.4s
+    GCN           base: NDCG=0.5602 Rec=0.8995 Prec=0.0899 time=78.7s
+    GCN            gsp: NDCG=0.5860 Rec=0.9084 Prec=0.0908 time=77.8s
+    GraphSAGE     base: NDCG=0.5675 Rec=0.9022 Prec=0.0902 time=78.3s
+    GraphSAGE      gsp: NDCG=0.5826 Rec=0.9066 Prec=0.0907 time=78.1s
+    GAT           base: NDCG=0.5545 Rec=0.8986 Prec=0.0899 time=199.1s
+    GAT            gsp: NDCG=0.5671 Rec=0.9005 Prec=0.0900 time=198.7s
+
+  [cosine|frac10|ms1]  nodes:0.28%  edges:0.04%  prepro:123.0s
+    LightGCN      base: NDCG=0.0945 Rec=0.1769 Prec=0.0177 time=23.1s
+    LightGCN       gsp: NDCG=0.0951 Rec=0.1800 Prec=0.0180 time=22.6s
+    GCN           base: NDCG=0.5950 Rec=0.9125 Prec=0.0913 time=95.4s
+    GCN            gsp: NDCG=0.5760 Rec=0.9052 Prec=0.0905 time=96.4s
+    GraphSAGE     base: NDCG=0.5887 Rec=0.9096 Prec=0.0910 time=95.7s
+    GraphSAGE      gsp: NDCG=0.5785 Rec=0.9064 Prec=0.0906 time=96.0s
+    GAT           base: NDCG=0.4426 Rec=0.8296 Prec=0.0830 time=244.6s
+    GAT            gsp: NDCG=0.5237 Rec=0.8743 Prec=0.0874 time=244.8s
+
+  [cosine|frac10|ms3]  nodes:3.56%  edges:0.54%  prepro:90.2s
+    LightGCN      base: NDCG=0.0945 Rec=0.1769 Prec=0.0177 time=23.0s
+    LightGCN       gsp: NDCG=0.1116 Rec=0.2013 Prec=0.0201 time=26.3s
+    GCN           base: NDCG=0.5869 Rec=0.9101 Prec=0.0910 time=95.1s
+    GCN            gsp: NDCG=0.5835 Rec=0.9041 Prec=0.0904 time=94.6s
+    GraphSAGE     base: NDCG=0.5955 Rec=0.9107 Prec=0.0911 time=95.7s
+    GraphSAGE      gsp: NDCG=0.5790 Rec=0.9030 Prec=0.0903 time=94.1s
+    GAT           base: NDCG=0.5402 Rec=0.8882 Prec=0.0888 time=243.8s
+    GAT            gsp: NDCG=0.5185 Rec=0.8745 Prec=0.0875 time=243.2s
+
+  [cosine|frac10|ms5]  nodes:1.97%  edges:0.58%  prepro:101.8s
+    LightGCN      base: NDCG=0.0945 Rec=0.1769 Prec=0.0177 time=23.2s
+    LightGCN       gsp: NDCG=0.0918 Rec=0.1739 Prec=0.0174 time=22.3s
+    GCN           base: NDCG=0.5803 Rec=0.9080 Prec=0.0908 time=95.7s
+    GCN            gsp: NDCG=0.5753 Rec=0.9019 Prec=0.0902 time=95.0s
+    GraphSAGE     base: NDCG=0.5813 Rec=0.9074 Prec=0.0907 time=95.3s
+    GraphSAGE      gsp: NDCG=0.5751 Rec=0.9008 Prec=0.0901 time=95.1s
+    GAT           base: NDCG=0.5454 Rec=0.8937 Prec=0.0894 time=243.7s
+    GAT            gsp: NDCG=0.5215 Rec=0.8827 Prec=0.0883 time=243.2s

@@ -1,0 +1,162 @@
+\chapter{Conclusion and Future Work}
+\graphicspath{{Chapter5/}}
+
+\section{Summary of Contributions}
+
+This work proposed and implemented the Graph Structural Pre-conditioning (GSP) framework, a graph compression pipeline that operates as a one-time preprocessing step before GNN training for recommendation. The key contributions are:
+
+\begin{itemize}
+    \item A sparse, memory-efficient implementation of Forman-Ricci and cosine similarity curvature computation that avoids constructing any dense $U \times U$ matrix, scaling beyond 100K users.
+    \item A combined Stage I (geometric grouping via connected components) and Stage II (effective resistance sparsification) pipeline that reduces both node count and edge redundancy while preserving structural bridges.
+    \item Empirical evaluation across three datasets (ML-1M, ML-25M, Yelp) and four GNN architectures (LightGCN, GCN, GraphSAGE, GAT), with 24 sweep configurations per dataset.
+\end{itemize}
+
+\section{Experimental Conclusions}
+
+\subsection*{Recommendation Quality}
+
+On ML-1M (full dataset, Forman-Ricci, min\_cluster\_size=5), GCN with GSP achieves NDCG@10 of 0.347 compared to 0.344 baseline (+0.7\%), while training time drops from 18.4s to 15.6s per epoch (15.2\% reduction). GraphSAGE maintains 96.4\% of baseline NDCG@10 with the same 15\% speedup. On Yelp (50\% fraction, 4.74\% node compression), GCN and GraphSAGE retain approximately 94--95\% of baseline NDCG@10 while achieving 4.7--5.2\% training time reduction per epoch.
+
+LightGCN is the most structurally robust model under GSP across all datasets and configurations, because its simplified mean-pooled propagation is insensitive to the small embedding differences introduced by super-node projection. GAT shows the highest sensitivity to graph structure changes but also the highest potential speedup on GAT-heavy workloads.
+
+\subsection*{Scalability}
+
+On ML-25M (25 million interactions, 162K users), GraphSAGE with GSP achieves a 39.6\% total training time reduction (20,625s → 12,448s) while improving NDCG@10 from 0.392 to 0.427 (+8.8\%). This disproportionate speedup at scale demonstrates that even marginal structural reductions produce significant batch-packing efficiency gains when the dataset is large.
+
+\subsection*{Forman-Ricci vs.\ Cosine Similarity}
+
+Forman-Ricci curvature consistently produces higher compression than cosine similarity across all dataset sizes and fractions. This is because the raw shared-item count term in FRC scales with degree, causing hub users to form larger clusters. Cosine similarity normalizes by degree, making it more conservative but also more robust to hub bias.
+
+\subsection*{GSP Preprocessing Overhead}
+
+The one-time GSP preprocessing cost ranges from 0.6 seconds (ML-1M 25\% fraction) to 208 seconds (ML-25M full dataset). This is amortized over all training epochs and is negligible compared to total training time in every tested configuration.
+
+\section{Future Work}
+
+\subsection*{Amazon Reviews Dataset}
+
+The next planned evaluation uses a subset of the \textbf{Amazon Reviews 2023} dataset~\cite{amazon_reviews2023} to test the GSP pipeline on a web-scale graph with heterogeneous product categories. The proposed subset covers:
+\begin{itemize}
+    \item \textbf{Unique Users:} approximately 18.3 million
+    \item \textbf{Unique Items:} approximately 1.6 million products
+    \item \textbf{Total Ratings:} approximately 43.9 million user-item interactions
+\end{itemize}
+
+The Amazon dataset's diversity across product categories (electronics, books, clothing) and its temporal rating structure make it a significantly more challenging benchmark than the movie and business review datasets used in this work.
+
+\subsection*{Improving Compression on Sparse Datasets}
+
+On ML-1M, the average user degree is only 9.2 items, which limits co-occurrence overlap and results in very low compression (0.15\%). An adaptive curvature threshold calibrated to the dataset's degree distribution is expected to increase compression on sparse datasets without degrading quality.
+
+\subsection*{Counterfactual Explanation Module}
+
+The current framework provides efficient and structurally interpretable recommendations (bridge edges are always preserved, so every recommendation can be traced to real user interactions), but does not yet generate explicit user-facing explanations. The planned explanation module uses structural counterfactual reasoning: for each recommendation, it identifies the minimal set of edge perturbations that would change the model's output, giving users a concrete ``why'' behind each suggestion~\cite{PradoRomeroetal2023}.
+
+\subsection*{Inductive Mapping for Dynamic Graphs}
+
+Production recommendation systems receive new interactions continuously. Retraining the full GSP pipeline on every update is impractical. The planned dynamic adaptation layer uses inductive geometric mapping: new interactions are assigned to the nearest existing super-node based on curvature compatibility, and local embedding updates are applied without global retraining. Preference shifts are detected when a new interaction produces $\mathcal{F}_{new} \le 0$, signaling that the user has moved into a structurally distinct neighborhood.
+
+\subsection*{Calibrated Projection}
+
+The 5--8\% NDCG@10 degradation observed on Yelp is partly attributable to embedding norm differences between super-nodes and the original user nodes they represent. A lightweight calibration layer trained to align the projected embedding distribution with the baseline distribution is expected to recover a portion of this gap without retraining the base GNN.
+
+% \noindent \textbf{Objective:}\\
+% To show the system can handle millions of nodes and billions of edges while staying within the memory limits of a standard consumer GPU and reduce training time.
+
+% \noindent \textbf{Efficiency Goal:}\\
+% To confirm that training on the simplified graph gets close to full-graph accuracy while meaningfully cutting computational time and VRAM usage.
+
+% \section{Resolving the Density Paradox}
+
+% Node grouping occasionally increased local structural density, slowing neighbor sampling rather than speeding it up. A cleanup stage was added to address this directly.
+
+% \subsection*{Super-Node Cleanup}
+
+% After grouping similar users, the Importance Score $I(e)$ prunes redundant intra-group edges, reducing excessive local connectivity while keeping the structure that actually matters.
+
+% \subsection*{Preservation of Bridge Edges}
+
+% Edges with negative curvature ($\mathcal{F} < 0$) are always retained. These connect distinct preference clusters and are what keeps recommendations diverse rather than repetitive.
+
+% % \subsection*{Hardware-Level Benefits}
+
+% % Restoring structural sparsity makes the graph more GPU-friendly, cutting per-epoch training time and improving sampling throughput.
+
+% \section{Mitigating Prediction Errors (RMSE Correction)}
+
+% Two mechanisms work together to keep recommendation quality intact after simplification:
+
+% \subsection*{Structure Matching}
+
+% The curvature-based formulation preserves connectivity patterns and spectral characteristics close to those of the original graph, so the simplified version isn't structurally alien to the model.
+
+% \subsection*{Calibrated Projection}
+
+% During the lifting phase, embeddings are projected back via mapping matrix $C$, and a calibration layer realigns the predicted rating distribution with the original data scale directly reducing RMSE degradation.
+
+% \section{Explanations and Real-Time Adaptation}
+
+% \subsection*{Explainable Recommendations}
+
+% Preserving bridge edges means every recommendation can be traced back to real structural interactions, giving users something concrete to understand rather than a black-box output.
+
+% \subsection*{Inductive Mapping for New Interactions}
+
+% When new interactions arrive, inductive mapping assigns them to existing structural groups based on geometric compatibility. No full retraining is needed.
+
+% \subsection*{Preference Shift Detection}
+
+% A new interaction producing $\mathcal{F}_{new} \le 0$ signals a structural deviation, say, a user branching into an unfamiliar genre. The system updates that user's profile locally rather than triggering a global retrain.
+
+% \subsection*{Future Amazon Reviews Dataset Characteristics}
+
+% Future scalability evaluation will use the \textbf{Amazon Reviews 
+% 2023} dataset~\cite{amazon_reviews2023}, which provides a realistic 
+% large-scale testbed:
+
+% \begin{itemize}
+%     \item \textbf{Unique Users:} 18.3 million
+%     \item \textbf{Unique Items:} 1.6 million products
+%     \item \textbf{Total Ratings:} 43.9 million user-item interactions
+%     \item \textbf{Review Tokens:} 2.7 billion words across review texts
+%     \item \textbf{Metadata Tokens:} 1.7 billion words across product metadata
+%     \item \textbf{Data Types:} Explicit ratings, review text, and metadata
+% \end{itemize}
+
+% \textbf{Proposed Usage:}
+
+% \begin{itemize}
+%     \item Modeled as a bipartite user-item graph with explicit rating edges.
+%     \item The full ICG pipeline (Coarsening, Adaptive Sparsification, 
+%     Vectorized Projection) applied to handle structural redundancy.
+%     \item Reduced graph used for training; projected back for inference.
+%     \item Evaluation covering scalability metrics (GPU memory, epoch 
+%     time), ranking metrics (NDCG@10, Precision@K), and structural 
+%     fidelity.
+% \end{itemize}
+
+% This dataset's scale , millions of users, billions of metadata tokens , makes it a rigorous final validation of the GSP framework's real-world applicability.
+
+\chapter{Conclusion and Future Work}
+\graphicspath{{Chapter5/}}
+
+\section{Conclusion}
+
+This research proposed a Graph Structural Pre-conditioning (GSP) framework to im-
+prove the scalability of Graph Neural Network (GNN) based recommendation systems.
+
+Traditional GNN recommendation systems have computational issues when applied on large scale user-item graphs. The proposed framework solves this problem by reducing the graph structure while preserving its structural importance
+
+The framework consists of three main stages: geometric grouping of similar nodes, adaptive sparsification and mapping the learned embeddings to the original graph.
+
+During the experimentation a density paradox was observed where because of node grouping the node density increased. To overcome this the stage -II is introduced to prune redundant edges and bridge edges are maintained to ensure diversity.
+
+
+\section{Future Work}
+
+Future work will focus on evaluating the framework on real time datasets such as Amazon review Dataset. These datasets contain millions of user item interactions and will help validate the proposed system better. The dataset will be modeled as a bipartite user-item graph and the GSP pipeline would be applied before training.
+
+The evaluation will focus on efficiency and recommendation quality using metrics such as GPU memory usage, training time per epoch, NDCG@10 and Precision@K.
+Another important addition is to improve real time adaptability and avoid retraining the whole model when new interactions occur, an inductive mapping mechanism will be used to assign new users or items to existing super node based structural similarity.
+
+These improvements will help extend the proposed framework towards practical deployment in large scale real time recommendation systems.

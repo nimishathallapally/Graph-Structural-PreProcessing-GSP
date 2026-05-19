@@ -1,0 +1,51 @@
+{
+  "output_dir": "outputs/amazon_music",
+  "run_baseline": true,
+  "models": ["lightgcn", "gat","gcn","graphsage"],
+  "data": {
+    "dataset_name": "digital_music",
+    "dataset_path": "Digital_Music.jsonl.gz",
+    "implicit_threshold": 4.0,
+    "test_seed": 42,
+    "debug_mode": false,
+    "max_debug_users": 5000,
+    "cache_dir": "outputs/cache",
+    "force_reload": false,
+    "min_interactions": 10
+  },
+  "gsp": {
+    "alpha": 0.5,
+    "curvature_percentile": 50.0,
+    "curvature_mode": "cosine",
+    "min_shared_interactions": 2,
+    "curvature_topk": 0,
+    "importance_percentile": 50.0,
+    "importance_topk": 0,
+    "er_num_eigenvectors": 32,
+    "er_solver": "dwlv",
+    "er_node_limit": 0,
+    "max_cluster_size": 50
+  },
+  "train": {
+    "epochs": 100,
+    "lr": 0.001,
+    "weight_decay": 1e-5,
+    "batch_size": 4096,
+    "neg_ratio": 8,
+    "rating_loss_weight": 0.2,
+    "emb_l2_weight": 1e-6,
+    "emb_dim": 128,
+    "hidden_dim": 256,
+    "out_dim": 128,
+    "num_layers": 4,
+    "heads": 4,
+    "dropout": 0.1,
+    "use_amp": true,
+    "seed": 42
+  },
+  "eval": {
+    "k": 10,
+    "num_negatives": 199,
+    "seed": 42
+  }
+}

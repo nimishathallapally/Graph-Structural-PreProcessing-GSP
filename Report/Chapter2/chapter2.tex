@@ -1,0 +1,119 @@
+% \chapter{Literature Review}
+% \graphicspath{{Chapter2/}}
+
+% \section{The Evolution of Recommendation Systems}
+
+% Recommendation systems have become absolutely necessary these days. Traditional approaches, such as Collaborative Filtering (CF) and Deep Neural Networks (DNNs), typically treat users and items as independent entities, failing to capture the rich relational context of interaction networks.
+
+% Graph Neural Networks (GNNs) address this by modeling the environment as a graph where nodes represent entities and edges represent interactions. Most GNNs follow the message-passing paradigm, iteratively updating vertex representations by gathering  and aggregating messages from their neighbors:
+
+% \begin{equation}
+% h_{v}^{i+1}=\sigma^{i}\left(h_{v}^{i},
+% \text{Agg}_{u\in\mathcal{N}(v)}
+% \left(h_{v}^{i},h_{u}^{i},e_{u,v}\right)\right)
+% \end{equation}
+
+% This process allows a $k$-layer GNN to learn both local collaborative signals and long-range dependencies.
+
+% \section{Scalability Challenges in Industrial-Scale Graphs}
+
+% While theoretically powerful, deploying GNNs on industrial graphs which can comprise billions of vertices and edges is difficult due to memory limitations.
+
+% \textbf{Memory Bound Operations:} GNN workloads are characterized by irregular memory access patterns and high data movement costs.
+
+% \textbf{The Over-Smoothing Problem:} Increasing GNN depth often leads to decreased performance, meaning model size remains small while data size grows exponentially.
+
+% \textbf{Inference Latency:} For giant graphs, the inference phase can be more time-consuming than training, as vertex and edge features are constantly updated in real-time applications like recommendation or fraud detection.
+
+% \section{System-Level Optimizations: The GLISP Paradigm}
+
+% Modern systems like GLISP solve speed and memory problems by looking at how real-world graphs are naturally built—specifically, how data is grouped together and how "hotspots" behave. GLISP uses three main parts to make training GNNs faster:
+
+% \subsection{Balanced Partitioning with AdaDNE}
+
+% When a graph is too big for one computer, it must be split up (partitioned) across many servers. Old methods, like edge-cut, often put too much work on the servers holding "super-users," causing a bottleneck. GLISP uses a new method called AdaDNE, which uses vertex-cut partitioning:
+
+% \textbf{The Vertex-Cut Advantage:} Instead of trying to keep a "super-user" on one server, the system "cuts" the user and spreads their millions of connections across many different servers. This way, no single server gets overwhelmed by one popular node.
+
+% \textbf{Adaptive Expansion:} AdaDNE acts like a smart balancer. It constantly checks how many users and connections are on each server and automatically adjusts the "expansion speed" to make sure the workload stays even.
+
+% \textbf{Proven Scale:} This approach is so efficient it can handle massive datasets like RelNet, which has over 10 billion users, whereas older systems simply crash~\cite{zhu2024glisp}.
+
+% \subsection{Load-Balanced Neighbor Sampling}
+
+% To avoid the "exponential explosion" of neighbors during message passing, systems utilize mini-batch neighbor sampling. GLISP formalizes this via a Gather-Apply paradigm:
+
+% \textbf{Collaborative Sampling:} One-hop sampling requests for hotspots are handled collaboratively by multiple servers, eliminating the load imbalance found in earlier systems.
+
+% \textbf{Memory Efficiency:} The system employs a contiguous memory layout and replaces explicit local IDs with $O(1)$ or $O(\log N)$ queries to reduce the memory footprint.
+
+% \section{Graph Simplification and Trustworthiness}
+
+% To further reduce complexity, research has branched into Graph Coarsening and Graph Condensation. While coarsening groups existing nodes into super-nodes, condensation synthesizes an entirely new, smaller proxy graph that retains the original graph's performance~\cite{hashemi2024graph}.
+
+% Beyond structural reduction, the project integrates:
+
+% \textbf{Discrete Curvature:} View the graph as a gemoetric shape to identify users with similar interests and understand how connected they are via Forman‑Ricci Curvature (FRC). Forman‑Ricci curvature is a discrete, combinatorial measure that quantifies the local geometric properties of edges in a network, capturing redundancy, and has been widely used to analyze connectivity, robustness, and community structure in complex graphs~\cite{hashemi2024graph, emergentmind_forman}.
+
+% \textbf{Counterfactual Reasoning:} Providing human-centric explanations by finding the minimal topological changes (edge perturbations) required to alter a model's output.
+
+% % \textbf{Graph Reordering:} GLISP utilizes the Partition based Degree Sort (PDS) algorithm to exploit data locality, which speeds up large-scale embedding retrieval by improving cache hit ratios.
+
+\chapter{Literature Review}
+\graphicspath{{Chapter2/}}
+
+\section{The Evolution of Recommendation Systems}
+
+Deep Neural Networks (DNNs) and Collaborative Filtering (CF) have been the most frequently used techniques in recommendation systems for a long time. These methods function very well, but they treat items and users as completely different entities, ignoring their relationship and the distribution of how user preferences are formed. 
+GNNs represent these interactions as a graph with nodes representing users or objects and edges representing the connections between them. The fundamental method is message-passing, in which every node continuously modifies its representation by obtaining data from its neighbors:
+
+
+\begin{equation}
+h_{v}^{i+1}=\sigma^{i}\left(h_{v}^{i},
+\text{Agg}_{u\in\mathcal{N}(v)}
+\left(h_{v}^{i},h_{u}^{i},e_{u,v}\right)\right)
+\end{equation}
+
+where $h_v^{i}$ represents the embedding (hidden representation) of node $v$ at layer $i$, 
+and $h_v^{i+1}$ denotes the updated embedding at layer $i+1$. 
+The function $\sigma^{i}$ is a nonlinear activation function applied at layer $i$. 
+$\text{Agg}$ denotes the aggregation function that combines information from neighboring nodes. 
+$\mathcal{N}(v)$ represents the set of neighbors of node $v$, and $u$ denotes a neighboring node in this set. 
+$h_u^{i}$ is the embedding of neighbor node $u$ at layer $i$, while $e_{u,v}$ represents the edge feature between nodes $u$ and $v$.\cite{gilmer2017neural}
+
+A $k$-layer GNN trained this way captures both local collaborative signals and longer range structural dependencies ,something that the earlier methods didn’t do.
+
+\section{Challenges with Scalability in Industrial Level Graphs}
+
+The problem is that this relationship between users and items doesn’t come easily. On industrial graphs with billions of vertices and edges, three issues tend to surface quickly:
+
+\textbf{Memory Bound Operations:} GNNs often involve irregular memory access because each node has different neighbors spread across the memory randomly and these patterns don’t map well onto GPU memory hierarchies, which causes increase in data movement costs.
+
+\textbf{The Over-Smoothing Problem:}  Adding more layers to capture deeper structure
+backfires, as the node representations converge to a common average and all node embeddings become nearly the same in the end when you actually need more expressiveness.\cite{Toppingetal2022}
+
+\textbf{Inference Latency:} In live systems like fraud detection or real-time recommendation, the features keep updating in real time hence inference tends to be slower than the actual training process.
+
+\section{Optimizations at a system level: The GLISP Paradigm}
+
+GLISP avoids these bottlenecks by understanding how real graphs are actually structured, especially around the hotspot nodes.~\cite{zhu2024glisp}.
+
+\subsection{Balanced Partitioning with AdaDNE}
+
+When a graph outgrows in memory on a single machine  then a partitioning algorithm is applied .Traditional edge-cut methods usually struggle here because usually a high degree node is assigned to a single server, which becomes a bottleneck as these nodes are  frequently accessed. GLISP overcomes this using vertex-cut partitioning ,instead of keeping a super-user in one node, it splits that node across multiple servers so no single machine has the full load.
+
+What makes AdaDNE practical is its adaptive balancing: it continuously monitors server load and adjust accordingly resulting in a system that scales to datasets like RelNet (10 billion+ users) where older approaches simply crash~\cite{zhu2024glisp}.
+
+\subsection{Neighbor sampling with node balancing}
+
+To prevent the exponential blowup of neighborhoods during message passing, GLISP uses mini-batch neighbor sampling through a Gather-Apply mechanism. Sampling requests frequently to the hotspot nodes are distributed across multiple servers, and a contiguous memory layout is used with O(1)or O(log N ) ID lookups keeps memory overhead manageable.
+
+\section{Simplifying graph and Trustworthiness}
+
+Two main strategies have emerged for reducing graph complexity before training: coarsening and condensation. Coarsening is basically merging the existing similar nodes into super-nodes, and condensation synthesizes an entirely new smaller proxy graph and is expected to match the original graph in performance~\cite{hashemi2024graph}. Both help with reducing the graph, but condensation sacrifices interpretability as the new proxy graph does not have the eaxct original interactions.\cite{liang2025democratic}.
+
+This project takes a different angle by trying to exploit the gemoetrical graph properties
+
+\textbf{Discrete Curvature:} I am Considering graph to be a geometric structure, Usinf a measure call the Forman-Ricci Curvature (FRC) that identifies edges that are structurally redundant versus those that act as bridges between completelt distinct communities. FRC is known to have good track record in analyzing connectivity and robustness in complex graph  networks~\cite{hashemi2024graph, emergentmind_forman}.\cite{fei2025efficient, fei2026dynamic}.
+
+\textbf{Counterfactual Reasoning:} Instead of just obtaining a black-box output from these large models, thee system generates explanations by identifying the minimal set of edge changes that would change a recommendation giving users a reason behind the recommendation. \cite{PradoRomeroetal2023}.

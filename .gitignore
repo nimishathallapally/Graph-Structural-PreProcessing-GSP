@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.whl
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Datasets (never commit raw data)
+data/
+*.json.gz
+*.dat
+
+# Model outputs and experiment results
+output/
+outputs/
+*.jsonl
+*.ckpt
+*.pt
+*.pth
+checkpoints/
+
+# Kaggle API token
+kaggle.json
+.kaggle/
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+*.ipynb
+
+# Caches
+.cache/
+*.pkl
+*.pickle
+*.npy
+*.npz
+
+# Figures output (generated — commit source scripts, not rendered images)
+figures/thesis/
+*.pdf
+*.png
+*.svg
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*~
+.vscode/
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/

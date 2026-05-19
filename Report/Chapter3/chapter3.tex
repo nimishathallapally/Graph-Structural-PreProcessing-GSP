@@ -1,0 +1,339 @@
+\chapter{Proposed Methodology}
+\label{chap:methodology}
+\graphicspath{{../figures/}{Chapter3/}}
+
+\section{Problem Formulation}
+
+Let $\mathcal{G} = (\mathcal{U} \cup \mathcal{I},\, \mathcal{E})$ denote the bipartite user-item interaction graph, where $\mathcal{U}$ is the set of users ($|\mathcal{U}| = U$), $\mathcal{I}$ is the set of items ($|\mathcal{I}| = I$), and $\mathcal{E} \subseteq \mathcal{U} \times \mathcal{I}$ is the set of observed interactions. Each interaction $(u, i) \in \mathcal{E}$ indicates that user $u$ rated item $i$ above an implicit threshold $\tau$ (set to 4.0 in all experiments). The corresponding binary interaction matrix is $A \in \{0,1\}^{U \times I}$, where $A_{ui} = 1$ if $(u, i) \in \mathcal{E}$.
+
+The degree of a user $u$ is $d_u = \sum_{i} A_{ui}$ (the number of positively-rated items). The objective of a recommender system is to learn an embedding function $f: \mathcal{U} \cup \mathcal{I} \to \mathbb{R}^d$ that places users and items with strong affinity close together in the latent space, enabling accurate top-$K$ retrieval at inference time.
+
+The principal notation used throughout this chapter is summarised in Table~\ref{tab:notation}.
+
+\begin{table}[h!]
+\centering
+\caption{Notation used in the proposed methodology.}
+\label{tab:notation}
+\begin{tabular}{@{}cl@{}}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+$U, I$ & Number of users and items \\
+$A \in \{0,1\}^{U \times I}$ & Binary user-item interaction matrix \\
+$d_u$ & Degree (interaction count) of user $u$ \\
+$UU \in \mathbb{Z}_{\ge 0}^{U \times U}$ & User-user co-occurrence matrix; $UU = A A^\top$ \\
+$\mathcal{F}(u,v)$ & Curvature assigned to edge $(u,v)$ in the UU graph \\
+$\tau_F$ & Curvature percentile threshold for high-curvature selection \\
+$\mathcal{S}_\text{HC}$ & High-curvature edge set after Stage I-b thresholding \\
+$\pi: \mathcal{U} \to \mathcal{U}'$ & Surjective user-to-super-node assignment (\texttt{user\_to\_super}) \\
+$C \in \{0,1\}^{U' \times U}$ & Sparse binary cluster assignment matrix \\
+$U'$ & Number of super-nodes after coarsening \\
+$ER(u,v)$ & Effective resistance of edge $(u,v)$ \\
+$I(e)$ & Adaptive importance score of edge $e$ \\
+$\alpha$ & Blending coefficient between curvature and ER components \\
+$H_\text{GNN} \in \mathbb{R}^{U' \times d}$ & Super-node embeddings produced by the GNN \\
+$H_\text{final} \in \mathbb{R}^{U \times d}$ & Final per-user embeddings after Stage III projection \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Framework Overview}
+
+The Graph Structural Pre-conditioning (GSP) framework reduces the computational cost of GNN-based collaborative filtering by coarsening the user-item graph prior to training. The pipeline consists of three stages executed once, offline, before the first training epoch:
+
+\begin{enumerate}
+    \item \textbf{Stage I --- Geometric Edge Scoring and Coarsening.} A sparse user-user co-occurrence graph is constructed from $A$. Each edge is assigned a geometric curvature score. Structurally redundant user pairs (high-curvature edges) are merged into super-nodes via a greedy heavy-edge matching procedure, producing a coarsened graph $\mathcal{G}'$.
+    \item \textbf{Stage II --- Spectral Sparsification via Effective Resistance.} Within the high-curvature subgraph, an adaptive importance score combining curvature and effective resistance selects a sparse subset of edges. This further reduces the edge set while preserving spectral connectivity.
+    \item \textbf{Stage III --- Vectorized Embedding Projection.} After GNN training on $\mathcal{G}'$, super-node embeddings are projected back to all original users via an $O(1)$ GPU indexing operation.
+\end{enumerate}
+
+The overall pipeline is illustrated in Figure~\ref{fig:gsp_pipeline}. The preprocessing cost is dominated by the sparse matrix multiply in Stage I and is incurred once; the GNN then trains on the substantially smaller coarsened graph for all subsequent epochs.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.80\textwidth]{fig01_pipeline.png}
+    \caption{Overview of the three-stage GSP pipeline: (I) geometric edge scoring and user coarsening; (II) spectral sparsification via effective resistance; (III) vectorised embedding projection from super-nodes back to all original users.}
+    \label{fig:gsp_pipeline}
+\end{figure}
+
+\section{Stage I-a: Sparse Curvature Computation}
+
+\subsection{User-User Co-occurrence via Sparse Matrix Multiply}
+
+The user-user co-occurrence count between two users $u$ and $v$ equals the inner product of their interaction vectors:
+\begin{equation}
+    (UU)_{uv} = \sum_{i=1}^{I} A_{ui} \cdot A_{vi} = \bigl(A A^\top\bigr)_{uv}.
+\end{equation}
+Computing $A A^\top$ densely would require $O(U^2)$ memory, which is infeasible for datasets with hundreds of thousands of users. Instead, $A$ is stored as a binary CSR sparse matrix and the product is computed in chunks of rows:
+\begin{equation}
+    UU_{\text{chunk}} = A[\text{row\_start}:\text{row\_end},\;:]\; \cdot\; A^\top.
+\end{equation}
+For each chunk, the result is extracted in COO format, retaining only upper-triangle entries ($u < v$) to avoid redundant symmetric storage. A minimum co-occurrence filter (\texttt{min\_shared\_interactions}, default 2) is applied per chunk to discard weakly-related pairs early.
+
+For large graphs exceeding 50,000 users, two additional memory safeguards are activated: (i) a maximum item-degree cap (\texttt{max\_item\_degree}) excludes globally popular items from the co-occurrence product, preventing hub items from creating spurious high-similarity pairs; and (ii) a per-user neighbor cap (\texttt{max\_neighbors\_per\_user}, auto-set to 100 for large graphs) retains only the top-100 UU neighbors per user by co-occurrence count, bounding the output sparsity.
+
+\subsection{Curvature Metrics}
+\label{sec:curvature}
+
+Two curvature metrics are supported, each scoring the structural compatibility of a user pair $(u,v)$:
+
+\subsubsection*{Forman-Ricci Curvature (FRC)}
+
+Forman-Ricci curvature on a graph is a combinatorial analogue of Ricci curvature from differential geometry~\cite{forman2003bochner}. For an edge $(u,v)$ in the user-user graph it reduces to:
+\begin{equation}
+    \mathcal{F}_{\text{FR}}(u,v) = 4 - d_u - d_v + \bigl|N(u) \cap N(v)\bigr|,
+    \label{eq:forman_ricci}
+\end{equation}
+where $N(u)$ is the item neighborhood of user $u$ and $|N(u) \cap N(v)|$ is the number of co-rated items. The term $4 - d_u - d_v$ is always negative for users with more than two interactions each; shared items provide a positive correction. Highly negative curvature identifies bridge edges connecting topologically distinct clusters, while near-zero or positive curvature indicates dense local neighborhoods where merging users incurs minimal information loss.
+
+\subsubsection*{Cosine Similarity Curvature}
+
+Cosine curvature normalizes the co-occurrence count by the geometric mean of user degrees, yielding a score in $(0, 1]$:
+\begin{equation}
+    \mathcal{F}_{\text{cos}}(u,v) = \frac{\bigl|N(u) \cap N(v)\bigr|}{\sqrt{d_u \cdot d_v}}.
+    \label{eq:cosine}
+\end{equation}
+This metric is invariant to absolute activity level: a pair of highly active users with proportionally many shared items receives the same score as a pair of low-activity users with the same relative overlap. Cosine curvature is more conservative on dense graphs with power-law degree distributions, whereas Forman-Ricci produces stronger signals on highly active users.
+
+\subsection{High-Curvature Edge Selection}
+\label{sec:hc_selection}
+
+After all UU edges have been scored, a subset $\mathcal{S}_\text{HC}$ of high-curvature edges is retained as the input to coarsening. Two selection strategies are provided:
+
+\begin{itemize}
+    \item \textbf{Percentile threshold.} Given parameter $\tau_F \in [0, 100)$ (default 70), all edges with curvature above the $\tau_F$-th percentile of the full curvature distribution are retained. This keeps the top $(100 - \tau_F)\%$ of edges. At $\tau_F = 70$, approximately 30\% of edges are retained.
+    \item \textbf{Exact top-$K$.} If \texttt{curvature\_topk} is set, exactly the $K$ highest-curvature edges are selected via \texttt{numpy.argpartition}, avoiding a full sort.
+\end{itemize}
+
+\section{Stage I-c: Graph Coarsening}
+\label{sec:coarsening}
+
+Given the high-curvature edge set $\mathcal{S}_\text{HC}$, users connected by such edges are merged into super-nodes. Two coarsening algorithms are provided.
+
+\subsection{Heavy-Edge Matching (Default)}
+\label{sec:hem}
+
+Heavy-Edge Matching (HEM) is a greedy algorithm widely used in multilevel graph partitioning~\cite{karypis1998fast}. The implementation applies the following procedure for $R = \lfloor \log_2(\texttt{max\_cluster\_size}) \rfloor$ rounds, where \texttt{max\_cluster\_size} is set to 50 by default:
+
+\begin{enumerate}
+    \item Sort all edges in $\mathcal{S}_\text{HC}$ by curvature in descending order.
+    \item Initialise a free set $\mathcal{F} = \mathcal{U}$ (all nodes unmatched).
+    \item For each edge $(u, v)$ in sorted order: if $u \neq v$ and both $u, v \in \mathcal{F}$, assign $u$ and $v$ to the same super-node and remove both from $\mathcal{F}$.
+    \item Repeat from step 2, treating each existing super-node as a single entity, for $R$ total rounds.
+\end{enumerate}
+
+Step 3 enforces a \emph{mutual matching} condition: only edges where both endpoints are currently unmatched are accepted. This prevents giant-component collapse that can occur with na\"ive connected-components-based approaches on dense graphs such as Yelp, where the UU graph can be highly connected. Nodes that remain unmatched after all rounds become singletons. The algorithm runs in $O(|\mathcal{S}_\text{HC}| \log |\mathcal{S}_\text{HC}|)$ dominated by the initial sort, plus $O(R \cdot U)$ for the vectorized matching passes. In practice it achieves 20--50\% user compression with bounded largest cluster size.
+
+\subsection{Connected-Components Coarsening (Alternative)}
+
+As an alternative, \texttt{scipy.sparse.csgraph.connected\_components} partitions the subgraph induced by $\mathcal{S}_\text{HC}$ into connected components, each of which becomes one super-node. An optional \texttt{max\_cluster\_size} cap post-processes large components by splitting them greedily.
+
+Because this approach tends to collapse all users in a highly connected subgraph into a single super-node, an adaptive retry mechanism is incorporated: if more than 80\% of users become singletons (indicating the retained edge set is too sparse to form clusters), the percentile threshold $\tau_F$ is relaxed by 10 percentage points and the procedure is retried. This continues until the singleton ratio falls below 80\% or the threshold reaches zero.
+
+\subsection{Sparse Cluster Assignment Matrix}
+
+After coarsening, let $U'$ denote the number of super-nodes and $\pi: \mathcal{U} \to \{0,\ldots,U'-1\}$ the assignment function. The cluster assignment matrix is:
+\begin{equation}
+    C \in \{0,1\}^{U' \times U}, \quad C_{k,u} = \mathbf{1}[\pi(u) = k].
+    \label{eq:C}
+\end{equation}
+$C$ is stored as a CSR sparse matrix with exactly one nonzero per column. The coarsened bipartite interaction graph is constructed by mapping user indices in the training set to their super-node indices via $\pi$, aggregating ratings by mean, and building the corresponding PyG \texttt{edge\_index} tensor.
+
+\section{Stage II: Spectral Sparsification via Effective Resistance}
+\label{sec:stage2}
+
+\subsection{Effective Resistance}
+
+The effective resistance $ER(u,v)$ of an edge $(u,v)$ in a graph is defined as the potential difference between $u$ and $v$ when a unit current is injected at $u$ and extracted at $v$, assuming unit edge conductances. Formally:
+\begin{equation}
+    ER(u,v) = \boldsymbol{e}_{uv}^\top L^+ \boldsymbol{e}_{uv},
+    \label{eq:er_def}
+\end{equation}
+where $L^+$ is the Moore-Penrose pseudoinverse of the graph Laplacian $L = D - W$ and $\boldsymbol{e}_{uv} = \boldsymbol{e}_u - \boldsymbol{e}_v$ is the signed edge incidence vector. Edges with high effective resistance are structural bridges whose removal would disproportionately degrade spectral connectivity. Effective resistance is computed on the Laplacian of $\mathcal{S}_\text{HC}$ rather than the full UU graph.
+
+\subsection{Solver Backends}
+
+Four approximate solvers are implemented, selected at runtime via the \texttt{er\_solver} parameter:
+
+\subsubsection*{ARPACK Eigensolver (\texttt{arpack})}
+
+The $k$ smallest non-trivial eigenpairs $(\lambda_i, \phi_i)$ of $L$ are computed using shift-invert ARPACK (\texttt{scipy.sparse.linalg.eigsh} with $\sigma = 10^{-6}$, \texttt{which}=``LM''). An \texttt{splu} factorization of $(L - \sigma I)$ is formed once and reused. The effective resistance is approximated as:
+\begin{equation}
+    ER(u,v) \approx \sum_{i=1}^{k} \frac{(\phi_i(u) - \phi_i(v))^2}{\lambda_i}, \quad k=32.
+    \label{eq:er_arpack}
+\end{equation}
+Eigenpairs are cached on disk via an MD5 hash key derived from the edge array and $k$, so repeated runs on identical graphs incur no re-computation.
+
+\subsubsection*{LOBPCG Solver (\texttt{lobpcg})}
+
+Locally Optimal Block Preconditioned Conjugate Gradient (LOBPCG) computes the same $k$ smallest eigenpairs without the $\texttt{splu}$ factorization. A Jacobi diagonal preconditioner is applied. LOBPCG is typically 5--20$\times$ faster than ARPACK on large sparse graphs. The ER approximation follows Eq.~(\ref{eq:er_arpack}).
+
+\subsubsection*{Johnson-Lindenstrauss Sketch (\texttt{jl})}
+
+The JL-sketch implements the Spielman-Srivastava spectral sparsification estimator~\cite{spielman2011spectral}. A matrix $Q \in \mathbb{R}^{k \times U}$ of independent standard Gaussian vectors is drawn, and $k$ symmetric linear systems $L x_i = Q_i^\top$ are solved via MINRES. The effective resistance estimator is:
+\begin{equation}
+    \widehat{ER}(u,v) = \frac{1}{k}\sum_{i=1}^{k} \bigl(x_i(u) - x_i(v)\bigr)^2,
+    \label{eq:er_jl}
+\end{equation}
+which is an unbiased estimator of $ER(u,v)$ by the Johnson-Lindenstrauss lemma, requiring no eigenvectors or matrix factorizations.
+
+\subsubsection*{Degree-Weighted Local Variation (\texttt{dwlv}, default)}
+
+The DWLV estimator provides a closed-form $O(\text{nnz})$ approximation using only local degree and co-occurrence information:
+\begin{equation}
+    \widehat{ER}(u,v) = \frac{1}{d_u} + \frac{1}{d_v} - \frac{2\,|N(u)\cap N(v)|}{d_u \cdot d_v},
+    \label{eq:er_dwlv}
+\end{equation}
+with an optional triangle-count correction. DWLV requires no eigenvector computation and is the default solver due to its $O(\text{nnz})$ time complexity. It is particularly well-suited to user-user co-occurrence graphs, where the local neighborhood structure closely approximates the global Laplacian pseudoinverse.
+
+\paragraph{Scalability safeguard.} When the number of users exceeds \texttt{er\_node\_limit} (default 50,000), the ER computation is skipped entirely and $\alpha$ is forced to 1.0, reducing the importance score to a pure curvature criterion. This ensures tractability on very large graphs such as the full MovieLens-25M dataset (162,541 users).
+
+\subsection{Adaptive Importance Scoring and Edge Retention}
+
+For each edge $e = (u,v) \in \mathcal{S}_\text{HC}$, the adaptive importance score combines normalized inverse curvature and normalized effective resistance:
+\begin{equation}
+    I(e) = \alpha \bigl(1 - \widehat{\mathcal{F}}(e)\bigr) + (1 - \alpha)\,\widehat{ER}(e),
+    \label{eq:importance}
+\end{equation}
+where $\widehat{\mathcal{F}}$ and $\widehat{ER}$ denote min-max normalized curvature and effective resistance respectively, and $\alpha \in [0,1]$ (default 0.5). The term $(1 - \widehat{\mathcal{F}})$ prioritizes structurally diverse edges of low curvature (potential bridges between user communities), while $\widehat{ER}$ prioritizes edges whose removal would most degrade spectral connectivity.
+
+Edges are ranked by $I(e)$ and the top fraction (controlled by \texttt{importance\_percentile} or \texttt{importance\_topk}) are retained as the final sparsified edge set $\mathcal{S}_\text{pruned} \subseteq \mathcal{S}_\text{HC}$.
+
+\subsection{Connectivity Guarantee}
+
+After thresholding, a connectivity repair pass ensures no node becomes isolated: for each node that appears in $\mathcal{S}_\text{HC}$ but has no incident edge in $\mathcal{S}_\text{pruned}$, its highest-importance incident edge is unconditionally re-added. This scatter-reduce is implemented via \texttt{numpy.maximum.at} in $O(|\mathcal{S}_\text{HC}|)$ time.
+
+\section{Stage III: Vectorized Embedding Projection}
+\label{sec:stage3}
+
+After training the GNN on the coarsened graph $\mathcal{G}'$, the model produces super-node embeddings $H_\text{GNN} \in \mathbb{R}^{U' \times d}$. These are projected back to the full user space using the precomputed assignment array $\pi \in \mathbb{Z}_{[0,U')}^{U}$, stored as a \texttt{torch.LongTensor}:
+\begin{equation}
+    H_\text{final}[u] = H_\text{GNN}[\pi(u)], \quad \forall u \in \mathcal{U}.
+    \label{eq:proj}
+\end{equation}
+This is equivalent to the matrix operation:
+\begin{equation}
+    H_\text{final} = C^\top H_\text{GNN} \in \mathbb{R}^{U \times d},
+    \label{eq:proj_matrix}
+\end{equation}
+executed as a single \texttt{torch.index\_select} call on the GPU. All users mapped to the same super-node receive identical embeddings. The operation runs in $O(U)$ time with contiguous memory access, amortizing the one-time preprocessing cost over all training epochs.
+
+\section{GNN Model Architectures}
+\label{sec:models}
+
+Four GNN architectures are evaluated to assess the generality of the GSP framework across different aggregation strategies.
+
+\subsection{LightGCN}
+
+LightGCN~\cite{he2020lightgcn} removes feature transformation matrices and non-linear activations from graph convolution, propagating only symmetrically normalized neighbor embeddings:
+\begin{equation}
+    h_v^{(l+1)} = \sum_{u \in \mathcal{N}(v)} \frac{1}{\sqrt{|\mathcal{N}(v)|\,|\mathcal{N}(u)|}} h_u^{(l)},
+    \label{eq:lightgcn}
+\end{equation}
+where $\mathcal{N}(v)$ is the neighbor set of $v$ in the bipartite graph. No self-loops are added. The final node embedding is the mean of all $K+1$ layer representations:
+\begin{equation}
+    z_v = \frac{1}{K+1}\sum_{l=0}^{K} h_v^{(l)}.
+    \label{eq:lightgcn_pool}
+\end{equation}
+The embedding table $E \in \mathbb{R}^{(U' + I) \times d}$ is initialized from $\mathcal{N}(0, 0.01^2)$. In all experiments, $K = 3$ propagation layers are used with $d = 64$ (Yelp) or $d = 128$ (MovieLens).
+
+\subsection{Graph Convolutional Network (GCN)}
+
+The two-layer GCN~\cite{kipf2017semi} applies symmetric normalized convolution with self-loops and a learnable weight matrix:
+\begin{equation}
+    H^{(l+1)} = \text{ReLU}\!\left(\hat{D}^{-1/2} \hat{A}\, \hat{D}^{-1/2} H^{(l)} W^{(l)}\right),
+    \label{eq:gcn}
+\end{equation}
+where $\hat{A} = A + I$ and $\hat{D}$ its degree matrix. Dropout 0.2 is applied between layers. Embedding and hidden dimensions are both 64.
+
+\subsection{GraphSAGE}
+
+GraphSAGE~\cite{hamilton2017inductive} uses an inductive mean aggregation:
+\begin{equation}
+    h_v^{(l+1)} = W^{(l)}\!\left[\text{MEAN}\bigl(\{h_u^{(l)} : u \in \mathcal{N}(v)\}\bigr)\right],
+    \label{eq:sage}
+\end{equation}
+implemented as two \texttt{SAGEConv} layers with ReLU activation and dropout 0.2. Hidden dimension is 128 and output dimension is 64.
+
+\subsection{Graph Attention Network (GAT)}
+
+GAT~\cite{velickovic2018graph} computes attention-weighted aggregation:
+\begin{equation}
+    h_v^{(l+1)} = \text{ELU}\!\left(\sum_{u \in \mathcal{N}(v)} a_{vu}^{(l)}\, W^{(l)} h_u^{(l)}\right),
+    \label{eq:gat}
+\end{equation}
+where $a_{vu}$ are learned attention coefficients. Layer 1 uses 4 heads in concatenation mode (effective hidden dimension 128); layer 2 uses 1 head in averaging mode (output dimension 64). ELU activation and dropout 0.2 are applied between layers. Gradient checkpointing is automatically enabled for graphs with more than 100,000 nodes to reduce peak activation memory.
+
+\section{Training Objective}
+
+All four models are trained with Bayesian Personalized Ranking (BPR) loss~\cite{rendle2009bpr}:
+\begin{equation}
+    \mathcal{L}_\text{BPR} = -\sum_{(u,i,j) \in \mathcal{D}} \log \sigma\!\left(\hat{y}_{ui} - \hat{y}_{uj}\right) + \lambda \|\Theta\|^2,
+    \label{eq:bpr}
+\end{equation}
+where $\hat{y}_{ui} = z_u^\top z_i$ is the predicted preference score (inner product of L2-normalized embeddings), $j$ is a uniformly sampled negative item for user $u$, $\sigma(\cdot)$ is the sigmoid function, and $\lambda$ is an L2 regularization weight. Training uses the Adam optimizer with learning rate $10^{-3}$, weight decay $10^{-5}$, cosine annealing learning rate schedule (minimum rate $10^{-5}$), vectorized negative sampling with 4--8 negatives per positive interaction, and mixed-precision (FP16/AMP) training. Early stopping with patience 10 is applied based on training loss.
+
+\section{Datasets}
+\label{sec:datasets}
+
+Three benchmark datasets are used in this work:
+
+\textbf{MovieLens-1M (ML-1M).} The MovieLens-1M dataset~\cite{movielens1m} contains approximately 1 million explicit ratings (1--5 stars) from 6,040 users on 3,706 movies. Ratings below the implicit threshold $\tau = 4.0$ are discarded, converting the dataset to implicit feedback. The full dataset is used in all experiments.
+
+\textbf{MovieLens-25M (ML-25M).} The MovieLens-25M dataset~\cite{movielens25m} contains 25 million ratings from 162,541 users on 59,047 movies. Due to its scale, experiments are conducted on random stratified subsets retaining the top $\rho \in \{0.25, 0.50, 0.75, 1.00\}$ fraction of users by interaction count, with $\tau = 4.0$.
+
+\textbf{Yelp (50\% Compressible Subset).} The Yelp Open Dataset~\cite{yelp_dataset} is filtered to retain users with at least 5 interactions, yielding 49,506 users, 56,440 businesses, and approximately 2 million interactions. Implicit threshold is 4.0.
+
+Dataset statistics are summarized in Table~\ref{tab:datasets}.
+
+\begin{table}[h!]
+\centering
+\caption{Summary of benchmark datasets used in evaluation.}
+\label{tab:datasets}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\textbf{Dataset} & \textbf{Users} & \textbf{Items} & \textbf{Interactions} & \textbf{Sparsity} & \textbf{Threshold $\tau$} \\
+\midrule
+ML-1M         & 6,040   & 3,706  & $\approx$1.0M  & 95.5\% & 4.0 \\
+ML-25M (full) & 162,541 & 59,047 & $\approx$25M   & 99.7\% & 4.0 \\
+Yelp (50\%)   & 49,506  & 56,440 & $\approx$2.0M  & 99.9\% & 4.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Evaluation Protocol}
+\label{sec:eval}
+
+\subsection{Leave-One-Out Data Split}
+
+For each user with at least two positive interactions (rating $\ge \tau$), exactly one positive interaction is held out uniformly at random as the test item. All remaining interactions are used for training. Users with fewer than two positive interactions are excluded from evaluation. The random seed is fixed to 42 for reproducibility.
+
+\subsection{Ranking Metrics}
+
+Following the standard sampled-ranking protocol~\cite{he2020lightgcn}, each test user is evaluated against the held-out positive item and 99 uniformly sampled negative items (not in the user's training set), for a candidate set of 100 items. The following metrics are computed at cutoff $K = 10$:
+
+\begin{itemize}
+    \item \textbf{NDCG@10:} Normalized Discounted Cumulative Gain; position-sensitive ranking quality.
+    \begin{equation}
+        \text{NDCG@}K = \frac{\text{DCG@}K}{\text{IDCG@}K}, \quad \text{DCG@}K = \sum_{k=1}^{K} \frac{\mathbf{1}[r_k = 1]}{\log_2(k+1)},
+    \end{equation}
+    where $r_k$ indicates whether the $k$-th ranked item is the test positive.
+    \item \textbf{Recall@10:} Fraction of test positives in the top-10 list (equals Hit Rate with one test positive per user).
+    \item \textbf{Precision@10:} Fraction of top-10 items that are test positives.
+\end{itemize}
+
+Both the GSP-conditioned model and the full-graph baseline are evaluated under identical conditions.
+
+\section{Hyperparameter Sweep Configuration}
+\label{sec:sweep}
+
+To assess the sensitivity of the GSP pipeline to its key hyperparameters, a systematic grid sweep is conducted across the following dimensions:
+
+\begin{itemize}
+    \item \textbf{Curvature mode:} $\{\text{cosine},\, \text{forman\_ricci}\}$ --- controls the geometric scoring function (Equations~\ref{eq:cosine} and~\ref{eq:forman_ricci}).
+    \item \textbf{Target fraction ($\rho$):} $\{0.25, 0.50, 0.75, 1.00\}$ --- for ML-25M, the fraction of users retained; for ML-1M and Yelp, the full dataset is always used.
+    \item \textbf{Minimum shared interactions (\texttt{min\_shared}):} $\{1, 3, 5\}$ --- minimum number of co-rated items required for a UU edge to be considered in curvature scoring.
+\end{itemize}
+
+All other parameters are held fixed: clustering method \texttt{hem}, ER solver \texttt{dwlv}, $\alpha = 0.5$, \texttt{max\_cluster\_size} = 50, 50 training epochs with early-stopping patience 10, all four GNN models (LightGCN, GCN, GraphSAGE, GAT). This yields $2 \times 4 \times 3 = 24$ configurations per dataset, with results reported in Chapter~\ref{chap:results}.
+

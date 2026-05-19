@@ -1,0 +1,331 @@
+﻿\chapter{Implementation and Experimental Results}
+\label{chap:results}
+\graphicspath{{../figures/}{Chapter4/}}
+
+This chapter reports the experimental evaluation of the GSP framework across three benchmark datasets. Section~\ref{sec:exp_setup} summarises datasets and evaluation. Section~\ref{sec:compression} presents compression statistics. Sections~\ref{sec:ml1m_results}--\ref{sec:ml25m_results} report recommendation quality for all four GNN architectures. Section~\ref{sec:sweep_analysis} analyses sensitivity to curvature mode and compression parameters; training efficiency is examined in Section~\ref{sec:training_efficiency}. Complete per-configuration sweep tables are provided in Appendix~\ref{app:sweep}.
+
+\section{Experimental Setup}
+\label{sec:exp_setup}
+
+Full dataset construction, evaluation protocol, and GNN architecture details are given in Chapter~\ref{chap:methodology}. Table~\ref{tab:dataset_summary} summarises the three benchmarks.
+
+\begin{table}[ht]
+\centering
+\caption{Benchmark dataset statistics. Sparsity is defined as $1 - \frac{|\mathcal{E}|}{|\mathcal{U}||\mathcal{I}|}$.}
+\label{tab:dataset_summary}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{l r r r r r}
+\toprule
+Dataset   & Users     & Items      & Interactions   & Sparsity  & Avg.\ Degree \\
+\midrule
+ML-1M     & 6{,}040   & 3{,}706    & 1{,}000{,}209  & 95.53\%   & 9.2 \\
+ML-25M    & 162{,}541 & 59{,}047   & 25{,}000{,}095 & 99.74\%   & 4.2 \\
+Yelp-50\% & 49{,}506  & 56{,}440   & 2{,}189{,}457  & 99.92\%   & 37.4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Evaluation uses the leave-one-out (LOO) protocol: one positive interaction per user is held out and ranked against 99 randomly sampled negatives. The primary metrics are NDCG@10 and Recall@10. The GSP sweep evaluates 2 curvature modes $\times$ 4 dataset fractions ($\rho \in \{0.25, 0.50, 0.75, 1.00\}$) $\times$ 3 minimum cluster sizes ($ms \in \{1, 3, 5\}$) = 24 configurations per dataset across four GNN models (LightGCN, GCN, GraphSAGE, GAT).
+
+\section{GSP Compression Statistics}
+\label{sec:compression}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.85\textwidth]{fig10_gsp_stats.png}
+    \caption{GSP compression ratios across all sweep configurations. Forman-Ricci curvature yields higher compression than Cosine Similarity; compression increases with both $\rho$ and $ms$.}
+    \label{fig:gsp_stats}
+\end{figure}
+
+Figure~\ref{fig:gsp_stats} summarises compression across all configurations. On ML-1M, compression remains modest (up to 0.15\% of nodes), reflecting its sparsity (average degree 9.2): few user pairs share enough co-interacted items to satisfy the high-curvature threshold. On Yelp, compression reaches 4.74\% nodes and 0.77\% edges at frac\,=\,0.50, $ms$\,=\,5, driven by the denser co-interaction structure (average degree 37.4). In both datasets the average super-node size is approximately 1.05, confirming that only the most geometrically proximate user pairs are merged. The one-time preprocessing cost is 3.8\,s on Yelp at the highest-compression setting and 208.5\,s on ML-25M.
+
+\section{Recommendation Quality: MovieLens-1M}
+\label{sec:ml1m_results}
+
+Table~\ref{tab:ml1m_summary} shows the best GSP result per model across all six frac\,=\,1.00 sweep entries (full ML-1M dataset). The best-configuration criterion is highest GSP NDCG@10 among the six (Forman-Ricci / Cosine) $\times$ ($ms \in \{1,3,5\}$) entries at frac\,=\,1.00.
+
+\begin{table}[ht]
+\centering
+\caption{ML-1M best-sweep summary (frac\,=\,1.00). Per-model best curvature mode and $ms$ selected by highest GSP NDCG@10. All models evaluated on the full ML-1M test split.}
+\label{tab:ml1m_summary}
+\resizebox{\textwidth}{!}{%
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{l l c r r r r r r r}
+\toprule
+\multirow{2}{*}{Model} & \multirow{2}{*}{Curv.} & \multirow{2}{*}{$ms$} &
+  \multicolumn{2}{c}{NDCG@10} & \multirow{2}{*}{$\Delta$NDCG (\%)} &
+  \multicolumn{2}{c}{Recall@10} & \multirow{2}{*}{$\Delta$Rec (\%)} &
+  \multirow{2}{*}{Nodes (\%)} \\
+\cmidrule(lr){4-5}\cmidrule(lr){7-8}
+ & & & Base & GSP & & Base & GSP & & \\
+\midrule
+LightGCN  & Cosine & 3 & 0.0779 & 0.0813 & $+4.4$ & 0.1000 & 0.1367 & $+36.7$ & 0.02 \\
+GCN       & Cosine & 1 & 0.3468 & 0.3533 & $+1.9$ & 0.6449 & 0.6478 & $+0.4$  & 0.00 \\
+GraphSAGE & Cosine & 5 & 0.3446 & 0.3589 & $+4.1$ & 0.6410 & 0.6061 & $-5.4$  & 0.03 \\
+GAT       & Cosine & 1 & 0.0888 & 0.0911 & $+2.6$ & 0.1873 & 0.1925 & $+2.8$  & 0.00 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Table~\ref{tab:ml1m_detailed} reports the same config used for the training-efficiency comparison (Forman-Ricci, frac\,=\,1.00, $ms$\,=\,5, the highest-compression ML-1M setting) and includes per-epoch training times and peak GPU memory.
+
+\begin{table}[ht]
+\centering
+\caption{ML-1M deployment-config comparison (Forman-Ricci, frac\,=\,1.00, $ms$\,=\,5; Nodes\,=\,0.15\%, Prepro\,=\,6.3\,s). Training time is per epoch.}
+\label{tab:ml1m_detailed}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{l r r r r r r r}
+\toprule
+\multirow{2}{*}{Model} &
+  \multicolumn{2}{c}{NDCG@10} & \multicolumn{2}{c}{Recall@10} &
+  \multicolumn{2}{c}{Train\,(s/ep)} & \multirow{2}{*}{Speedup\,(\%)} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+ & Base & GSP & Base & GSP & Base & GSP & \\
+\midrule
+LightGCN  & 0.0779 & 0.0768 & 0.1010 & 0.1479 & 20.0 & 17.8 & $+11.0$ \\
+GCN       & 0.3441 & 0.3467 & 0.6412 & 0.5922 & 18.4 & 15.6 & $+15.2$ \\
+GraphSAGE & 0.3541 & 0.3413 & 0.6521 & 0.5854 & 18.4 & 15.6 & $+15.2$ \\
+GAT       & 0.0896 & 0.1969$^\dagger$ & 0.1892 & 0.3931$^\dagger$ & 32.4 & 31.6 & $+2.5$ \\
+\bottomrule
+\multicolumn{8}{l}{\footnotesize $\dagger$ GAT baseline at frac\,=\,1.00 is anomalously low; see Section~\ref{sec:discussion}.}
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig02_ndcg10_comparison.png}
+    \caption{NDCG@10 for baseline vs.\ GSP-projected models across all four architectures on ML-1M and Yelp.}
+    \label{fig:ndcg10_comparison}
+\end{figure}
+
+\paragraph{Observations.}
+GCN and GraphSAGE are the primary beneficiaries of GSP on ML-1M. At the best-quality configuration (Cosine, $ms$\,=\,1), GCN improves by $+1.9\%$ NDCG with zero node compression---the benefit arises from improved neighbour structure in the projected graph. At the highest-compression setting (FR, $ms$\,=\,5), GCN retains a small NDCG gain ($+0.8\%$) while training time falls 15\% per epoch. GraphSAGE follows a similar trend but shows a $-3.6\%$ NDCG regression at high compression, suggesting its local neighbourhood sampling is more sensitive to structural perturbations. LightGCN's simplified mean-pooling makes it the most robust model: NDCG stays within 5\% of baseline across all 12 frac\,=\,1.00 configurations. GAT exhibits training instability at frac\,=\,1.00 (baseline NDCG varies from 0.088 to 0.093 across random seeds, compared to 0.31--0.33 at frac\,=\,0.50), and the large GAT ``improvement'' in Table~\ref{tab:ml1m_detailed} should not be taken as a genuine quality gain.
+
+\section{Recommendation Quality: Yelp}
+\label{sec:yelp_results}
+
+Table~\ref{tab:yelp_summary} shows the best GSP result per model at frac\,=\,1.00 on the full Yelp-50\% split.
+
+\begin{table}[ht]
+\centering
+\caption{Yelp best-sweep summary (frac\,=\,1.00). Per-model best configuration selected by highest GSP NDCG@10.}
+\label{tab:yelp_summary}
+\resizebox{\textwidth}{!}{%
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{l l c r r r r r r r}
+\toprule
+\multirow{2}{*}{Model} & \multirow{2}{*}{Curv.} & \multirow{2}{*}{$ms$} &
+  \multicolumn{2}{c}{NDCG@10} & \multirow{2}{*}{$\Delta$NDCG (\%)} &
+  \multicolumn{2}{c}{Recall@10} & \multirow{2}{*}{$\Delta$Rec (\%)} &
+  \multirow{2}{*}{Nodes (\%)} \\
+\cmidrule(lr){4-5}\cmidrule(lr){7-8}
+ & & & Base & GSP & & Base & GSP & & \\
+\midrule
+LightGCN  & FR     & 5 & 0.0945 & 0.1135 & $+20.1$ & 0.1769 & 0.2083 & $+17.8$ & 2.91 \\
+GCN       & Cosine & 3 & 0.5869 & 0.5835 & $-0.6$  & 0.9101 & 0.9041 & $-0.7$  & 3.56 \\
+GraphSAGE & FR     & 3 & 0.5761 & 0.5709 & $-0.9$  & 0.9058 & 0.9012 & $-0.5$  & 4.35 \\
+GAT       & FR     & 5 & 0.4842 & 0.5319 & $+9.9$  & 0.8602 & 0.8835 & $+2.7$  & 2.91 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Table~\ref{tab:yelp_detailed} gives the deployment-config comparison at the highest-compression Yelp setting.
+
+\begin{table}[ht]
+\centering
+\caption{Yelp deployment-config comparison (Forman-Ricci, frac\,=\,0.50, $ms$\,=\,5; Nodes\,=\,4.74\%, Prepro\,=\,3.8\,s). Training time is per epoch.}
+\label{tab:yelp_detailed}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{l r r r r r r r}
+\toprule
+\multirow{2}{*}{Model} &
+  \multicolumn{2}{c}{NDCG@10} & \multicolumn{2}{c}{Recall@10} &
+  \multicolumn{2}{c}{Train\,(s/ep)} & \multirow{2}{*}{Speedup\,(\%)} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+ & Base & GSP & Base & GSP & Base & GSP & \\
+\midrule
+LightGCN  & 0.1011 & 0.0944 & 0.2176 & 0.1999 & 20.4 & 20.1 & $+1.5$ \\
+GCN       & 0.5638 & 0.5347 & 0.9032 & 0.8913 & 62.2 & 59.3 & $+4.7$ \\
+GraphSAGE & 0.5615 & 0.5313 & 0.9019 & 0.8901 & 62.2 & 59.0 & $+5.2$ \\
+GAT       & 0.5616 & 0.5168 & 0.8998 & 0.8799 & 154.0 & 148.2 & $+3.9$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig03_multi_metric_yelp.png}
+    \caption{Multi-metric comparison (NDCG@10, Recall@10, Precision@10) on Yelp for all models in baseline and GSP-projected mode.}
+    \label{fig:multi_metric_yelp}
+\end{figure}
+
+\paragraph{Observations.}
+On Yelp, GCN and GraphSAGE show the highest absolute performance (NDCG@10 $\approx$ 0.57--0.59) and are highly robust to GSP: at the best frac\,=\,1.00 configuration the quality degradation is below $1\%$ NDCG while node compression reaches 3.6--4.4\%. At the high-compression deployment config (frac\,=\,0.50, $ms$\,=\,5), degradation is $5\%$--$6\%$ NDCG, with GCN training time improving by 4.7\% and GraphSAGE by 5.2\%. LightGCN shows a surprisingly large positive swing ($+20.1\%$ NDCG at FR frac\,=\,1.00, $ms$\,=\,5) and a simultaneous decline at the high-compression setting, consistent with its sensitivity to the sparsity of the evaluation partition. GAT benefits significantly ($+9.9\%$ NDCG) at frac\,=\,1.00, $ms$\,=\,5, where its baseline was depressed ($0.4842$), but remains within $-8\%$ of its peak baseline across most other configurations.
+
+\section{Large-Scale Validation: MovieLens-25M}
+\label{sec:ml25m_results}
+
+To validate scalability, the full ML-25M dataset (25 million ratings, 162K users, 59K items) was evaluated under the Forman-Ricci GSP pipeline with frac\,=\,1.00, $ms$\,=\,1.
+
+\begin{table}[ht]
+\centering
+\caption{ML-25M results: Forman-Ricci, frac\,=\,1.00, $ms$\,=\,1. Nodes reduced: 0.02\%; Prepro: 208.5\,s. GAT did not converge at this scale (NaN values omitted).}
+\label{tab:ml25m_results}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{l r r r r r r r}
+\toprule
+\multirow{2}{*}{Model} &
+  \multicolumn{2}{c}{NDCG@10} & \multirow{2}{*}{$\Delta$NDCG (\%)} &
+  \multicolumn{2}{c}{Recall@10} & \multirow{2}{*}{$\Delta$Rec (\%)} &
+  \multirow{2}{*}{Speedup (\%)} \\
+\cmidrule(lr){2-3}\cmidrule(lr){5-6}
+ & Base & GSP & & Base & GSP & & \\
+\midrule
+LightGCN  & 0.1081 & 0.1031 & $-4.6$ & 0.1465 & 0.1479 & $+1.0$ & n/a \\
+GCN       & 0.5268 & 0.4443 & $-15.7$ & 0.8557 & 0.7773 & $-9.2$ & n/a \\
+GraphSAGE & 0.3923 & 0.4267 & $+8.8$ & 0.7249 & 0.7448 & $+2.7$ & $+39.6$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Despite only 0.02\% node compression, GraphSAGE training time on ML-25M drops from 20{,}625\,s to 12{,}448\,s --- a \textbf{39.6\%} speedup. This batch-packing effect arises because the marginally reduced graph fits slightly more edges per mini-batch at large scale, reducing the total number of gradient steps to convergence. GCN shows a large NDCG decline ($-15.7\%$), likely due to its global aggregation being more sensitive to the subtle structural change at 162K-user scale. These results confirm that GSP scales to tens of millions of interactions with acceptable preprocessing overhead (3.5 minutes, one-time).
+
+\section{Sweep Sensitivity Analysis}
+\label{sec:sweep_analysis}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig07b_sweep_ml1m_forman.png}
+    \caption{ML-1M sweep: NDCG@10 across fractions (25\%--100\%) and $ms \in \{1,3,5\}$ with Forman-Ricci curvature. GSP-projected models track baselines closely at all configurations.}
+    \label{fig:sweep_ml1m_forman}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig07d_sweep_yelp_forman.png}
+    \caption{Yelp sweep: NDCG@10 across fractions and cluster sizes with Forman-Ricci curvature. Larger fractions increase compression and produce moderate NDCG degradation for GCN and GraphSAGE.}
+    \label{fig:sweep_yelp_forman}
+\end{figure}
+
+Complete numerical results for all 24 ML-1M and 24 Yelp configurations are tabulated in Appendix~\ref{app:sweep}. The sweep reveals four consistent trends:
+
+\begin{itemize}
+    \item \textbf{Curvature mode:} Forman-Ricci achieves higher node compression than Cosine Similarity across all fraction--$ms$ pairs because its degree-normalised score scales with shared-item count, producing higher absolute curvature for hub users. Quality differences between the two modes are small ($<2\%$ NDCG) for GCN and GraphSAGE.
+
+    \item \textbf{Compression--quality tradeoff:} On ML-1M, NDCG for GCN and GraphSAGE stays within 5\% of baseline across all 24 configurations. On Yelp, the gap widens to $\sim$5--8\% at the most aggressive settings (frac\,=\,0.50 or 1.00, $ms$\,=\,5) where the cluster structure is coarser and the 99-negative evaluation protocol amplifies small embedding shifts.
+
+    \item \textbf{Model robustness:} LightGCN is the most stable model across all configurations on ML-1M (mean $|\Delta\text{NDCG}| < 3\%$); its mean-pooled propagation is insensitive to minor structural perturbations. GAT shows the highest variance, oscillating between large gains and moderate losses depending on the random initialisation at frac\,=\,1.00.
+
+    \item \textbf{Minimum cluster size:} Increasing $ms$ from 1 to 5 raises compression but also increases the risk of merging users with heterogeneous preferences. On Yelp, $ms$\,=\,5 triggers the highest degradation for GCN ($\approx$$-5\%$ NDCG relative to $ms$\,=\,1) while LightGCN sometimes benefits ($+20\%$) due to the sparser Yelp user graph becoming more compact.
+\end{itemize}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.85\textwidth]{fig12_ndcg_vs_fraction.png}
+    \caption{NDCG@10 vs.\ dataset fraction for baseline and GSP-projected models, showing a stable performance gap as the fraction increases.}
+    \label{fig:ndcg_vs_fraction}
+\end{figure}
+
+\section{Training Efficiency and Resource Usage}
+\label{sec:training_efficiency}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig09b_speedup_ml1m_forman.png}
+    \caption{Per-epoch training speedup on ML-1M (Forman-Ricci) across models and fractions. GCN and GraphSAGE consistently achieve 10--15\% speedup at frac\,=\,1.00.}
+    \label{fig:speedup_ml1m}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig09d_speedup_yelp_forman.png}
+    \caption{Per-epoch training speedup on Yelp (Forman-Ricci). GCN and GraphSAGE achieve 4--5\% at frac\,=\,0.50; GAT achieves 3.9\%.}
+    \label{fig:speedup_yelp}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig06_resources.png}
+    \caption{Peak GPU memory (MB) and training time for baseline and GSP modes across all models and datasets. GSP does not increase peak memory usage in any configuration.}
+    \label{fig:resources}
+\end{figure}
+
+On ML-1M, GCN and GraphSAGE achieve a consistent \textbf{15\%} per-epoch speedup at the highest-compression setting (6{,}040 $\to$ 6{,}031 super-nodes), and LightGCN achieves 11\%. The speedup is disproportionate to the 0.15\% node reduction because the projected graph removes inter-cluster edges, which reduces the number of aggregation operations per forward pass. GAT's attention mechanism recomputes all edge weights each forward pass, limiting speedup to 2.5\%. On Yelp, the 4.74\% node compression yields 4.7--5.2\% per-epoch speedup for GCN and GraphSAGE. Peak GPU memory usage is unchanged or slightly reduced in all configurations (Figure~\ref{fig:resources}), confirming that GSP introduces no memory overhead.
+
+\section{Convergence Analysis}
+\label{sec:convergence}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig04_loss_curves_ml1m.png}
+    \caption{BPR training loss on ML-1M: baseline vs.\ GSP-projected. GSP models converge at similar rates across all architectures; final loss values are within 1--3\% of baseline.}
+    \label{fig:loss_ml1m}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig05_loss_curves_yelp.png}
+    \caption{BPR training loss on Yelp. GSP-projected models show marginally faster early convergence, consistent with the reduced graph having lower per-epoch overhead in early epochs.}
+    \label{fig:loss_yelp}
+\end{figure}
+
+Both datasets confirm smooth convergence: no instabilities arise from the super-node projection across any model or configuration, and final BPR loss values are within 1--3\% of their respective baselines.
+
+\section{Recommendation Explanations}
+\label{sec:explanations}
+
+Every recommendation produced by the framework is accompanied by a structured explanation stored in the \texttt{analytics/explanations/} sub-directory of each sweep output folder. Explanations are generated post-hoc by tracing each top-$k$ recommendation back to the user embedding graph, and are classified into two \emph{reasoning types}:
+
+\begin{itemize}
+    \item \textbf{Embedding:} the item is recommended purely on the basis of learned embedding proximity between the user and item representations. No graph-neighbourhood path could be identified. Example: \textit{``Recommended based on your embedding profile similarity to item\_276 (rank 1). Popularity: 18 training interactions.''}
+
+    \item \textbf{Neighbourhood\,+\,Graph:} at least one similar user who interacted with the target item was identified in the user--user graph. The explanation lists the contributing neighbour(s), their cosine-similarity contribution scores, the number of shared co-interacted items, and the full graph path. Example: \textit{``Recommended because 1 similar user(s) (e.g.\ users 5761) interacted with item\_2426. \ldots\ The most similar contributing neighbour shared 39 item(s) with you.''} The path is reported as \textit{``User 0 $\to$ neighbour 5761 via shared items [0, 513, 1154] $\to$ item 2426.''} 
+\end{itemize}
+
+\paragraph{Reasoning-type distribution.}
+Table~\ref{tab:explanation_types} reports the fraction of recommendations (top-5 per user, 1{,}000 users) attributed to each reasoning type for the ML-1M Cosine frac\,=\,1.00 $ms$\,=\,1 configuration --- the best single-dataset configuration. GCN and GraphSAGE produce neighbourhood-grounded explanations for $\approx$60\% of recommendations, reflecting their explicit message-passing over the user--item graph. LightGCN and GAT fall back to embedding-only explanations for $>$80\% of recommendations because their propagation mixes neighbourhood signals more uniformly, making individual-path attribution ambiguous.
+
+\begin{table}[ht]
+\centering
+\caption{Explanation reasoning-type distribution on ML-1M (Cosine, frac\,=\,1.00, $ms$\,=\,1). Percentages over top-5 recommendations for 1{,}000 sampled users. Avg.\ contrib.\ is the mean number of contributing neighbours per neighbourhood+graph explanation.}
+\label{tab:explanation_types}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{l r r r r r r}
+\toprule
+\multirow{2}{*}{Model} & \multicolumn{2}{c}{Embedding (\%)} & \multicolumn{2}{c}{Neighbourhood+Graph (\%)} & \multicolumn{2}{c}{Avg.\ contrib.} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+ & Base & GSP & Base & GSP & Base & GSP \\
+\midrule
+LightGCN   & 83.4 & 81.4 & 16.6 & 18.6 & 1.50 & 1.49 \\
+GCN        & 41.0 & 39.7 & 59.0 & 60.3 & 2.37 & 2.40 \\
+GraphSAGE  & 40.3 & 40.4 & 59.7 & 59.6 & 2.41 & 2.39 \\
+GAT        & 82.1 & 81.8 & 17.9 & 18.2 & 1.51 & 1.51 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Explanation consistency under GSP compression.}
+A key property of the GSP framework is that super-node projection should not distort the neighbourhood structure used by the explainer. Two consistency checks confirm this:
+
+\begin{enumerate}
+    \item \textbf{Reasoning-type stability:} For every model, 100\% of user--item pairs receive the same reasoning type (embedding or neighbourhood+graph) under both the baseline and GSP-projected graph. No recommendation flips from a neighbourhood-grounded explanation to a pure-embedding fallback (or vice versa) as a result of compression.
+
+    \item \textbf{Contribution-score drift:} For GCN and GraphSAGE, the maximum neighbour contribution score is identical between baseline and GSP for all shared user--item pairs in the explanation set ($\Delta = 0.0000$ averaged over $>$900 matched pairs per model). This indicates that the super-node projection preserves the relative user similarity ordering seen by the explainer.
+\end{enumerate}
+
+These results are consistent with the GSP design: merged super-nodes inherit the union of their constituent users' edge sets before projection, so any graph path that existed in the original graph remains intact in the compressed graph unless the endpoint nodes themselves were merged. At the compression levels observed on ML-1M ($\leq$0.15\% nodes removed) this condition is almost never triggered.
+
+\paragraph{Path-level traceability.}
+The neighbourhood+graph explanations expose full two-hop paths of the form \emph{target user $\to$ contributing neighbour $\to$ shared item set $\to$ recommended item}. This path is stored verbatim in the \texttt{path} and \texttt{path\_description} fields of each explanation record, enabling downstream auditing. On ML-1M, contributing neighbours share on average 27--39 items with the target user, providing a dense, human-verifiable rationale. The complete explanation records are available in JSON and CSV format in the \texttt{analytics/explanations/} directory of every sweep output folder.
+
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+\textbf{Low compression on ML-1M.} The dataset's sparsity (average degree 9.2) means that few user pairs satisfy the co-occurrence threshold required by the curvature metric. Only 0.02--0.15\% of nodes are compressed even at the most aggressive settings. Adaptive threshold calibration based on dataset density is a natural extension.
+
+\textbf{Quality degradation on Yelp at high compression.} At frac\,=\,0.50, $ms$\,=\,5 the 4.74\% compression causes a 5--8\% relative NDCG drop for GCN and GraphSAGE. The degradation is partly amplified by the 99-negative LOO protocol: small embedding shifts from super-node projection change a small fraction of borderline rankings, inflating the relative metric drop. A calibrated post-projection norm correction is expected to recover a portion of this gap.
+
+\textbf{GAT instability.} GAT requires 7.8\,GB peak VRAM on the 50\% Yelp subset and shows high baseline variance at frac\,=\,1.00 on ML-1M. The combined effect of large attention weight matrices and sensitivity to random initialisation makes GAT results less reliable than GCN or GraphSAGE for assessing GSP quality impact. Mixed-precision training (FP16) and gradient checkpointing are the primary remedies for the memory issue.
+
+\textbf{ML-25M batch-packing effect.} The unexpectedly large 39.6\% training speedup on ML-25M despite only 0.02\% node compression warrants further investigation. The current hypothesis is that the reduced graph changes how edges are packed into mini-batches; a controlled ablation varying batch size at constant graph size would isolate this effect.
+

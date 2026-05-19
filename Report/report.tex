@@ -1,0 +1,266 @@
+%**********************************************
+%Choose appropriate document class:
+
+%For B.Tech ==> \documentclass[BTech]{iiitdmdiss}
+%For DD ==> \documentclass[DD]{iiitdmdiss}
+%For M.Tech ==> \documentclass[MTech]{iiitdmdiss}
+
+%**********************************************
+%\documentclass[MTech]{iiitdmdiss}
+%\documentclass[DD]{iiitdmdiss}
+\documentclass[BTech]{iiitdmdiss}
+\usepackage{times}
+\usepackage{tikz}
+\usepackage{t1enc}
+\usepackage[utf8]{inputenc}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{pgfplots}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{epstopdf}
+\usepackage{fancyhdr}
+\usepackage[driverfallback=dvipdfm]{hyperref} % hyperlinks for references.
+\usepackage{amsmath} % easier math formulae, align, subequations \ldots
+\usepackage{booktabs}
+\usepackage{longtable}
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\footrulewidth}{1pt}
+
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title page
+%-----------------------------------------------
+% Provide all the necessary information here
+%-----------------------------------------------
+\title{Exploiting Graph Properties for Efficient and Trustworthy Recommender Systems}
+\author{Thallapally Nimisha}
+\roll{CS22B1082}
+\monthyear{May 2026}
+\department{Computer Science and Engineering}
+\guide{Prof.Sivaselvan B}
+\guidedesignation{Professor}
+\guidedept{Computer Science and Engineering}
+\date{May 2026}
+
+%\nocite{*}
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Declaration of originality
+\declaration
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Certificate
+\certificate
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Acknowledgements
+\acknowledgements
+
+\makeatletter
+
+I would like to express my sincere gratitude to {\bf \@guide} for his continuous guidance, insightful discussions, and constructive feedback throughout this research. Their expertise in graph-based learning systems and their encouragement to think critically about both scalability and trustworthiness helped me to make impactful contribution.
+
+I am deeply thankful to the \textbf{Department of Computer Science and Engineering, IIITDM Kancheepuram}, for providing the academic environment, computational resources, and research support necessary to explore large-scale graph learning and responsible AI systems.
+
+I also extend my heartfelt appreciation to my \textbf{professors and mentors}, whose teachings in machine learning, graph theory, and ethical AI inspired me to investigate the intersection of efficiency, interpretability in recommendation systems.
+
+
+\makeatother
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Abstract
+\abstract
+
+Modern recommendation systems are just black boxes, they lack in transparency and computational scalability for large graphs. This research proposes a framework designed to improve both efficiency and trustworthiness in graph-based recommendation systems. To address the computational bottleneck in modern graph based recommendation systems,An intrinsic graph compression framework is developed that exploits structural properties of graphs —such as Forman-Ricci Curvature and Spectral Conductance—to identify structure redundancy in user item graphs and prune them
+
+To ensure trustworthiness, the framework incorporates explanation module. This module provides explanations by identifying the minimal set of interactions responsible for a recommendation. By combining structuring compression with  counterfactual reasoning, this work contributes to the development of scalable, human-centric AI systems aligned with the principles of responsible AI for social empowerment in sensitive domains.
+
+\vspace{10pt}
+\noindent \textbf{Keywords:} Graph Neural Networks; Forman-Ricci Curvature; Counterfactual Explanations; Spectral Conductance; Recommender Systems.
+
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Table of contents etc.
+
+\begin{singlespace}
+\tableofcontents
+\thispagestyle{empty}
+
+\listoftables
+\addcontentsline{toc}{chapter}{LIST OF TABLES}
+\listoffigures
+\addcontentsline{toc}{chapter}{LIST OF FIGURES}
+\end{singlespace}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Abbreviations
+\abbreviations
+
+\noindent
+\begin{tabbing}
+xxxxxxxxxxxx \= xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \kill
+
+\textbf{GNN} \> Graph Neural Network \\
+
+\textbf{CF} \> Collaborative Filtering \\
+
+\textbf{DNN} \> Deep Neural Network \\
+
+\textbf{GSP} \> Graph Structural Pre-conditioning \\
+
+\textbf{ICG} \> Information-driven Coarsening Graph \\
+
+\textbf{FRC} \> Forman-Ricci Curvature \\
+
+\textbf{DNC} \> Degree-Normalized Curvature \\
+
+\textbf{ER} \> Effective Resistance \\
+
+\textbf{GLISP} \> Graph Learning Infrastructure with Scalable Partitioning \\
+
+\textbf{PDS} \> Partition-based Degree Sort \\
+
+\textbf{VRAM} \> Video Random Access Memory \\
+
+\textbf{RMSE} \> Root Mean Squared Error \\
+
+\textbf{NDCG@10} \> Normalized Discounted Cumulative Gain at rank 10 \\
+
+\textbf{Precision@K} \> Precision at rank K \\
+
+\textbf{GPU} \> Graphics Processing Unit \\
+
+\textbf{FP16} \> 16-bit Floating Point Precision \\
+
+\textbf{LOO} \> Leave-One-Out (evaluation protocol) \\
+
+\textbf{BPR} \> Bayesian Personalized Ranking \\
+
+\textbf{Recall@K} \> Recall at rank K \\
+
+\textbf{GCN} \> Graph Convolutional Network \\
+
+\textbf{GAT} \> Graph Attention Network \\
+
+\textbf{LightGCN} \> Light Graph Convolutional Network \\
+
+
+\end{tabbing}
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Notation
+\notation
+\noindent
+\begin{singlespace}
+\begin{tabbing}
+xxxxxxxxxxxx \= xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \kill
+
+\textbf{$\mathcal{G} = (\mathcal{V}, \mathcal{E})$} \> Original user-item graph \\
+
+\textbf{$\mathcal{G}' = (\mathcal{V}', \mathcal{E}')$} \> Reduced (coarsened) graph \\
+
+\textbf{$\mathcal{V}$} \> Set of vertices (users and items) \\
+
+\textbf{$\mathcal{E}$} \> Set of edges (interactions) \\
+
+\textbf{$u, v$} \> Nodes in the graph \\
+
+\textbf{$N(v)$} \> Neighborhood of node $v$ \\
+
+\textbf{$h_v^{(l)}$} \> Hidden representation of node $v$ at layer $l$ \\
+
+\textbf{$\mathcal{F}(u,v)$} \> Degree-normalized Forman-Ricci curvature of edge $(u,v)$ \\
+
+\textbf{$ER(e)$} \> Effective resistance of edge $e$ \\
+
+\textbf{$I(e)$} \> Importance score of edge $e$ \\
+
+\textbf{$\alpha$} \> Balancing factor between curvature and resistance \\
+
+\textbf{$C$} \> Mapping matrix from original nodes to Super-Nodes \\
+
+\textbf{$A$} \> Adjacency matrix of original graph \\
+
+\textbf{$A'$} \> Adjacency matrix of reduced graph \\
+
+\textbf{$X$} \> Feature matrix of original graph \\
+
+\textbf{$X'$} \> Feature matrix of reduced graph \\
+
+\textbf{$H_{\text{GNN}}$} \> Node embeddings learned on reduced graph \\
+
+\textbf{$H_{\text{final}}$} \> Final projected embeddings on original graph \\
+
+\textbf{$d_{max}$} \> Maximum node degree in the graph \\
+
+\textbf{$O(1)$} \> Constant time complexity \\
+
+\end{tabbing}
+\end{singlespace}
+
+\pagebreak
+\clearpage
+
+% The main text will follow from this point so set the page numbering
+% to arabic from here on.
+\pagenumbering{arabic}
+\pagestyle{fancy}
+\fancyhf{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Enter the details of roll number, department and year for Header and Footer
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\fancyhead[l]{\leftmark}
+\fancyfoot[r]{\thepage}
+\fancyhead[r]{CS22B1082}
+
+\fancyfoot[l]{Department of CSE, IIITDM Kancheepuram, March 2026}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{Chapter1/chapter1}
+\input{Chapter2/chapter2}
+\input{Chapter3/chapter3}
+\input{Chapter4/chapter4}
+\input{Chapter5/chapter5}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Appendices.
+% Comment out if not needed
+\appendix
+\input{App1/app1}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliography.
+
+\begin{singlespace}
+%     \nocite{liang2025democratic}
+% \nocite{fei2025efficient}
+% \nocite{fei2026dynamic}
+% \nocite{Toppingetal2022}
+% \nocite{PradoRomeroetal2023}
+  \bibliography{References}
+  \addcontentsline{toc}{chapter}{REFERENCES}
+\end{singlespace}
+
+% \pagebreak
+% \weeklyreport
+% Insert the image of the Weekly review report
+
+% \pagebreak
+% \plagiarism
+% Insert the 1st page of the plagiarism report (containing the similarity index). Make sure that it is duly signed by you as well as your supervisor.
+
+
+
+
+\end{document}

@@ -1,0 +1,52 @@
+{
+  "output_dir": "outputs",
+  "run_baseline": true,
+  "models": ["lightgcn", "gat", "graphsage", "gcn"],
+  "ablation": {
+    "enabled": true,
+    "ablation_model": "lightgcn",
+    "ablation_epochs": 30,
+    "importance_percentiles": [20.0, 35.0, 50.0, 65.0, 80.0]
+  },
+  "data": {
+    "implicit_threshold": 3.5,
+    "test_seed": 42,
+    "debug_mode": false,
+    "max_debug_users": 5000,
+    "cache_dir": "outputs/cache",
+    "force_reload": false,
+    "min_interactions": 5
+  },
+  "gsp": {
+    "alpha": 0.5,
+    "curvature_percentile": 70.0,
+    "min_shared_interactions": 2,
+    "curvature_topk": 30000,
+    "importance_percentile": 50.0,
+    "importance_topk": 0,
+    "er_num_eigenvectors": 32,
+    "max_cluster_size": 5
+  },
+  "train": {
+    "epochs": 100,
+    "lr": 0.005,
+    "weight_decay": 0.00001,
+    "batch_size": 65536,
+    "neg_ratio": 8,
+    "rating_loss_weight": 0.0,
+    "emb_l2_weight": 0.00001,
+    "emb_dim": 128,
+    "hidden_dim": 256,
+    "out_dim": 128,
+    "num_layers": 4,
+    "heads": 4,
+    "dropout": 0.1,
+    "use_amp": true,
+    "seed": 42
+  },
+  "eval": {
+    "k": 10,
+    "num_negatives": 499,
+    "seed": 42
+  }
+}
